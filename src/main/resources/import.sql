@@ -1,2 +1,0 @@
--- insert into user(user_email,password) values('llmooon@naver.com','hs466831');
--- insert into user(user_email,password) values('llmooon2@naver.com','hs466831');
