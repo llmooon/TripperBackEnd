@@ -21,8 +21,6 @@ import java.util.List;
 public class SampleController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Autowired
-    private UserRepository userRepository;
 
     @GetMapping("/hello")
     @ApiOperation(value="sample api",notes = "테스트 용 API")

@@ -1,6 +1,7 @@
 package org.soma.tripper.User;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -9,7 +10,6 @@ import org.soma.tripper.domain.User;
 import org.soma.tripper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Repository;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -26,6 +26,13 @@ public class UserTest {
     @Autowired
     UserRepository userRepository;
 
+    @Before
+    public void makeuser(){
+        userRepository.save(User.builder()
+                .email("leeth")
+                .password("mylove")
+                .build());
+    }
     @After
     public void cleanup(){
         userRepository.deleteAll();
@@ -33,21 +40,16 @@ public class UserTest {
 
     @Test
     public void getUser(){
-        //given
-        userRepository.save(User.builder()
-            .user_email("leeth")
-            .password("mylove")
-            .build()
-        );
-
         //when
         List<User> userList = userRepository.findAll();
-
         //then
         User user = userList.get(0);
-        assertThat(user.getUser_email(),is("leeth"));
-
+        assertThat(user.getEmail(),is("leeth"));
     }
 
-
+    @Test
+    public void loginUser(){
+        User user = userRepository.findUserByEmailAndPassword("leeth","mylove");
+        assertThat(user.getEmail(),is("leeth"));
+    }
 }
