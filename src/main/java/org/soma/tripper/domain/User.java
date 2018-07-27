@@ -1,10 +1,7 @@
 package org.soma.tripper.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,27 +10,32 @@ import java.io.Serializable;
 @Getter
 @ToString
 @Entity
+//@NoArgsConstructor(access=AccessLevel.PROTECTED)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int user_num;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
     @JsonIgnore
-    @Column(name="password")
+    @Column(name="password", nullable = false)
     private String password;
 
+    @Column(name="name",nullable = false)
     private String name;
-    private String sex;
+    private int sex;
 
-    @Builder
-    public User(String email, String password){
-        this.email = email;
+
+    @Builder User(int user_num, String name, String email, String password, int sex){
+        this.sex=sex;
+        this.user_num=user_num;
+        this.name=name;
         this.password=password;
+        this.email=email;
     }
 
-    public User(){ }
-
+    public User(){}
 }

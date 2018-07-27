@@ -31,7 +31,9 @@ public class SwaggerConfig {
                 .build()
                 //.apiInfo(apiInfo())
                 .useDefaultResponseMessages(false)
-                .globalResponseMessage(RequestMethod.GET,getArrayList());
+                .globalResponseMessage(RequestMethod.GET,getArrayList())
+                .globalResponseMessage(RequestMethod.POST,getArrayList());
+
     }
 
     private ArrayList<ResponseMessage> getArrayList() {
