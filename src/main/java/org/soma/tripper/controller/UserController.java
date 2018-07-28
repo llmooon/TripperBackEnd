@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/user")
@@ -38,25 +39,21 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO){
         try{
             userService.registerUser(userDTO);
-        }catch (DuplicateKeyException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
+        catch (NullPointerException e){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-//    @GetMapping("/login/{user_id}/{password}")
-//    @ApiOperation(value="User api",notes = "로그인")
-//    @ApiResponses(
-//            value={@ApiResponse(code=200,message="Successfully retrieved"),
-//            })
-//    public ResponseEntity<User> loginUser(@PathVariable("user_id") String user_id, @PathVariable("password") String pw){
-//        User user = userRepository.findUserByEmailAndPassword(user_id,pw).orElseThrow(()->new IllegalArgumentException("Not Found"));
-////
-////        if(user==null){
-////            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-////        }
-//        return new ResponseEntity<>(user,HttpStatus.OK);
-//    }
+    @PostMapping("/login/{user_email}/{password}")
+    @ApiOperation(value="User api",notes = "로그인")
+    @ApiResponses(
+            value={@ApiResponse(code=200,message="Successfully retrieved"),
+            })
+    public ResponseEntity<User> loginUser(@PathVariable String user_email, @PathVariable String password){
+        User user = userService.login(user_email,password).orElseThrow(()->new NoSuchElementException("회원 정보가 유호하지 않습니다."));
+        return new ResponseEntity<>(user,HttpStatus.OK);
+    }
 
 }
