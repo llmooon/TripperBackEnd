@@ -46,12 +46,7 @@ public class UserTest {
         List<User> userList = userRepository.findAll();
         //then
         User user = userList.get(0);
-        assertThat(user.getEmail(),is("leeth"));
+        assertThat(user.getEmail(),is("aaaa@aaaa.com"));
     }
 
-    @Test
-    public void loginUser(){
-        //User user = userRepository.findUserByEmailAndPassword("leeth","mylove");
-        //assertThat(user.getEmail(),is("leeth"));
-    }
 }
