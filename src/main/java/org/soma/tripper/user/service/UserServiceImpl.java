@@ -1,18 +1,15 @@
-package org.soma.tripper.service;
+package org.soma.tripper.user.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.soma.tripper.domain.User;
-import org.soma.tripper.dto.UserDTO;
-import org.soma.tripper.repository.UserRepository;
+import org.soma.tripper.user.domain.User;
+import org.soma.tripper.user.dto.UserDTO;
+import org.soma.tripper.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
@@ -38,5 +35,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public Optional<User> login(String id, String password) {
         return Optional.ofNullable(userRepository.findUserByEmailAndPassword(id,password));
+    }
+
+    @Override
+    public User isInEmail(String user_email) {
+        return userRepository.findByEmail(user_email);
     }
 }

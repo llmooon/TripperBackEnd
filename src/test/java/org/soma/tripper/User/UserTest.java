@@ -6,13 +6,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.soma.tripper.domain.User;
-import org.soma.tripper.repository.UserRepository;
+import org.soma.tripper.user.dto.UserDTO;
+import org.soma.tripper.user.repository.UserRepository;
+import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
 
 
 import static org.hamcrest.core.Is.is;
@@ -22,31 +21,32 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest
 public class UserTest {
     Logger logger = LoggerFactory.getLogger(this.getClass());
+    UserDTO userDTO1;
+    @Autowired
+    UserService userService;
 
     @Autowired
     UserRepository userRepository;
 
     @Before
     public void makeuser(){
-        userRepository.save(User.builder()
-                .email("aaaa@aaaa.com")
-                .password("aaaa")
-                .name("a")
+        userDTO1 = UserDTO.builder()
+                .email("llmooon@naver.com")
+                .password("1234")
                 .sex(1)
-                .build());
+                .name("아")
+                .device_token("4444")
+                .build();
     }
+
     @After
     public void cleanup(){
         userRepository.deleteAll();
     }
 
     @Test
-    public void getUser(){
-        //when
-        List<User> userList = userRepository.findAll();
-        //then
-        User user = userList.get(0);
-        assertThat(user.getEmail(),is("aaaa@aaaa.com"));
+    public void saveAndGetUser(){
+        userService.registerUser(userDTO1);
+        //more...
     }
-
 }
