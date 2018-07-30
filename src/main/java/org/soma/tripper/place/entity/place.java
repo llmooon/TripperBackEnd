@@ -15,7 +15,7 @@ import javax.persistence.Id;
 public class place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String place_num;
+    private int place_num;
 
     private String country;
     private String city;

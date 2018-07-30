@@ -3,7 +3,7 @@ package org.soma.tripper.place.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.soma.tripper.place.Service.SearchService;
+import org.soma.tripper.place.entity.Search;
 import org.soma.tripper.place.repository.SearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,9 @@ public class SearchServiceImpl implements SearchService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
+    public Search SearchRegion(String city, String country){
+        return searchRepository.findByCityOrCountry(city,country);
+    }
 
 
 }

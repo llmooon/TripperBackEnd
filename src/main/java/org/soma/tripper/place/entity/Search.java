@@ -20,8 +20,8 @@ public class Search {
 
     private String country;
     private String city;
-    private Array recommended1;
-    private Array recommended2;
-    private Array recommended3;
-    private Array recommended4;
+    private String recommended1;
+    private String recommended2;
+    private String recommended3;
+    private String recommended4;
 }

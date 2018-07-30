@@ -1,5 +1,7 @@
 package org.soma.tripper.place.Service;
 
-public interface SearchService {
+import org.soma.tripper.place.entity.Search;
 
+public interface SearchService {
+    Search SearchRegion(String city, String country);
 }

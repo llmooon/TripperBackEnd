@@ -26,7 +26,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/create")
-    @ApiOperation(value="User api",notes = "회원가입")
+    @ApiOperation(value="Register user",notes = "회원가입")
     public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO){
 
         if(userDTO.getEmail()==null || userDTO.getPassword()==null || userDTO.getDevice_token()==null){
@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @PostMapping("/login/{user_email}/{password}")
-    @ApiOperation(value="User api",notes = "로그인")
+    @ApiOperation(value="Login user",notes = "로그인")
     public ResponseEntity<User> loginUser(@PathVariable String user_email, @PathVariable String password){
         if(user_email==null||password==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         User user = userService.login(user_email,password).orElseThrow(()->new NoSuchElementException("회원 정보가 유호하지 않습니다."));
