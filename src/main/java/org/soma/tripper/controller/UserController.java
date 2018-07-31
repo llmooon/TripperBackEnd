@@ -46,7 +46,7 @@ public class UserController {
     @ApiOperation(value="Login user",notes = "로그인")
     public ResponseEntity<User> loginUser(@PathVariable String user_email, @PathVariable String password){
         if(user_email==null||password==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        User user = userService.login(user_email,password).orElseThrow(()->new NoSuchElementException("회원 정보가 유호하지 않습니다."));
+        User user = userService.login(user_email,password);
         if(user==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(user,HttpStatus.OK);
     }

@@ -33,8 +33,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Optional<User> login(String id, String password) {
-        return Optional.ofNullable(userRepository.findUserByEmailAndPassword(id,password));
+    public User login(String id, String password) {
+        return userRepository.findUserByEmailAndPassword(id,password);
     }
 
     @Override
