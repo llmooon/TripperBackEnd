@@ -49,6 +49,11 @@ dependencies {
     compile 'log4j:log4j:1.2.17'
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile 'org.slf4j:slf4j-log4j12:1.7.5'
+// S3
+    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
+    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.371'
+
+
 
     compile('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
