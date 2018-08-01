@@ -53,6 +53,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
     compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.371'
 
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
 
 
     compile('mysql:mysql-connector-java')
