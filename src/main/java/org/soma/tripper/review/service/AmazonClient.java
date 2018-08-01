@@ -4,7 +4,9 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,6 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
@@ -34,7 +35,7 @@ public class AmazonClient {
     @Value("${amazonProperties.secretKey}")
     private String secretKey;
 
-    DateTime date = new DateTime();
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
@@ -48,19 +49,18 @@ public class AmazonClient {
     public String uploadFile(MultipartFile multipartFile) {
         String fileUrl = "";
         String realbucket = bucketName;
-        bucketName=bucketName.concat("/"+date.getYear()+"/"+date.getMonthOfYear()+"/"+date.getDayOfMonth());
         try {
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(multipartFile);
-            Date today = new Date();
-            SimpleDateFormat date = new SimpleDateFormat("yyyy/mm/dd");
+            DateTime date = new DateTime();
+            bucketName = bucketName.concat("/" + date.getYear() + "/" + date.getMonthOfYear() + "/" + date.getDayOfMonth());
             fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
             uploadFileTos3bucket(fileName, file);
             file.delete();
-            bucketName=realbucket;
+            bucketName = realbucket;
         } catch (Exception e) {
             e.printStackTrace();
-            bucketName=realbucket;
+            bucketName = realbucket;
         }
         return fileUrl;
     }

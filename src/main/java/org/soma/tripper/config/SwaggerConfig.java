@@ -39,10 +39,11 @@ public class SwaggerConfig {
     private ArrayList<ResponseMessage> getArrayList() {
         ArrayList<ResponseMessage> lists = new ArrayList<ResponseMessage>();
 
-        lists.add(new ResponseMessageBuilder().code(200).message("성공").responseModel(new ModelRef("OK")).build());
         lists.add(new ResponseMessageBuilder().code(201).message("생성 성공").responseModel(new ModelRef("Create Success")).build());
         lists.add(new ResponseMessageBuilder().code(400).message("나쁜 요청").responseModel(new ModelRef("Bad Request")).build());
         lists.add(new ResponseMessageBuilder().code(403).message("권한 에러").responseModel(new ModelRef("Forbidden")).build());
+        lists.add(new ResponseMessageBuilder().code(409).message("중복").responseModel(new ModelRef("conflict")).build());
+
         lists.add(new ResponseMessageBuilder().code(500).message("서버 에러").responseModel(new ModelRef("Error")).build());
         return lists;
     }

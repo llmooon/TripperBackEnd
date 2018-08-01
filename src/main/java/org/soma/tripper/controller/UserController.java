@@ -2,6 +2,8 @@ package org.soma.tripper.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.user.domain.User;
@@ -27,6 +29,7 @@ public class UserController {
 
     @PostMapping("/create")
     @ApiOperation(value="Register user",notes = "회원가입")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO){
 
         if(userDTO.getEmail()==null || userDTO.getPassword()==null || userDTO.getDevice_token()==null){
@@ -42,11 +45,14 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login/{user_email}/{password}")
+    @PostMapping("/login")
     @ApiOperation(value="Login user",notes = "로그인")
-    public ResponseEntity<User> loginUser(@PathVariable String user_email, @PathVariable String password){
-        if(user_email==null||password==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        User user = userService.login(user_email,password);
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved list"),
+    })
+    public ResponseEntity<User> loginUser(@RequestBody UserDTO userDTO){
+        if(userDTO.getEmail()==null||userDTO.getPassword()==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        User user = userService.login(userDTO.getEmail(),userDTO.getPassword());
         if(user==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
