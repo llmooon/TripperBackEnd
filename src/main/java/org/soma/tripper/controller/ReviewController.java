@@ -1,5 +1,6 @@
 package org.soma.tripper.controller;
 
+import org.soma.tripper.review.dto.ReviewDTO;
 import org.soma.tripper.review.entity.Review;
 import org.soma.tripper.review.repository.ReviewRepository;
 import org.soma.tripper.review.service.ReviewService;
@@ -30,5 +31,11 @@ public class ReviewController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
+    @PostMapping("upload")
+    public ResponseEntity<ReviewDTO> upload(@RequestBody ReviewDTO reviewDTO){
+
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

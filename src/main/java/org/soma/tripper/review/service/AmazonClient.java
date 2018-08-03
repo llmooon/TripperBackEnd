@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.GetObjectAclRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -40,10 +41,6 @@ public class AmazonClient {
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
         this.s3client = new AmazonS3Client(credentials);
-//        DateTime date = new DateTime();
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmdd");
-//       // bucketName=bucketName.concat(dateFormat.format(date));
-//        logger.info(bucketName);
     }
 
     public String uploadFile(MultipartFile multipartFile) {
@@ -86,5 +83,10 @@ public class AmazonClient {
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
         s3client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
         return "Successfully deleted";
+    }
+
+    public void download(){
+        //GetObjectAclRequest getObjectAclRequest = new GetObjectAclRequest(bucketName,key);
+
     }
 }

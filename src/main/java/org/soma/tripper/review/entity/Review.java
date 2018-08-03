@@ -8,12 +8,11 @@ import java.util.List;
 @Getter
 @ToString
 @Entity
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private int review_num;
+    private int reviewnum;
 
     @Column(name = "user_num")
     private int usernum;
