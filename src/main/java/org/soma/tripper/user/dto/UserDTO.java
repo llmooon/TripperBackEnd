@@ -34,4 +34,9 @@ public class UserDTO {
         this.sex = sex;
         this.device_token = device_token;
     }
+    @Builder
+    public UserDTO(String email, String password){
+        this.email=email;
+        this.password=password;
+    }
 }

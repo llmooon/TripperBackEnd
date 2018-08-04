@@ -15,6 +15,11 @@ public class ReviewServiceImpl implements ReviewService {
     public List<Review> loadReview(int user_num, int schedule_num) {
         return reviewRepository.findReviewByUsernumAndSchedulenum(user_num,schedule_num);
     }
+
+    @Override
+    public Review uploadReview(Review review) {
+        return reviewRepository.save(review);
+    }
 }
 
 

@@ -17,21 +17,11 @@ public class Photo {
     @Column(name="bucket")
     private String bucket;
 
-    @ManyToOne(targetEntity = Review.class,fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewnum")
-    private Collection<Review> review;
-
-    public void addreview(Review r){
-        if(review==null){
-            review=new ArrayList<>();
-        }
-        review.add(r);
-    }
+    @Column(name="reviewnum")
+    private String reviewnum;
 
     @Builder
-    Photo(int photonum,String bucket, int reviewnum){
-        this.photonum=photonum;
+    Photo(String bucket){
         this.bucket=bucket;
-
     }
 }

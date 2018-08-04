@@ -1,8 +1,11 @@
 package org.soma.tripper.review.entity;
 
 import lombok.*;
+import org.soma.tripper.practice.Phone;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -14,7 +17,7 @@ public class Review {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int reviewnum;
 
-    @Column(name = "user_num")
+    @Column(name = "usernum")
     private int usernum;
 
     @Column(name = "schedule_num")
@@ -29,8 +32,19 @@ public class Review {
     @Column(name="ml_rating")
     private double mlrating;
 
-    @Builder Review(int user_num, int schedulenum, String content, double rating){
-        this.usernum=user_num;
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinColumn(name = "reviewnum")
+    private Collection<Photo> photos;
+
+    public void addPhoto(Photo p){
+        if(photos==null){
+            photos=new ArrayList<>();
+        }
+        photos.add(p);
+    }
+
+    @Builder Review(int usernum, int schedulenum, String content, double rating){
+        this.usernum=usernum;
         this.usernum = schedulenum;
         this.content=content;
         this.rating = rating;
