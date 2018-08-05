@@ -5,6 +5,7 @@ import org.soma.tripper.review.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -20,6 +21,12 @@ public class ReviewServiceImpl implements ReviewService {
     public Review uploadReview(Review review) {
         return reviewRepository.save(review);
     }
+
+    @Override
+    public List<Review> loadMainReview() {
+        return reviewRepository.findAll();
+    }
+
 }
 
 

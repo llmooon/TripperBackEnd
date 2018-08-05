@@ -7,6 +7,7 @@ import org.soma.tripper.review.entity.Review;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -15,10 +16,18 @@ public class ReviewDTO {
     private int schedulenum;
     private String content;
     private double rating;
+    private List<byte[]> photolist;
     //private List<MultipartFile> photolist;
 
     public ReviewDTO() {
         super();
+    }
+
+    void addphoto(byte[] p){
+        if(photolist==null){
+            photolist=new ArrayList<>();
+        }
+        photolist.add(p);
     }
 
     @Builder ReviewDTO(int usernum, int schedulenum, String content, double rating){
@@ -38,4 +47,7 @@ public class ReviewDTO {
                 .build();
     }
 
+    public void setPhotolist(List<byte[]> photolist) {
+        this.photolist = photolist;
+    }
 }

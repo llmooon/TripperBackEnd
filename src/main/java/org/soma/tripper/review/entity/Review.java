@@ -2,6 +2,7 @@ package org.soma.tripper.review.entity;
 
 import lombok.*;
 import org.soma.tripper.practice.Phone;
+import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -50,4 +51,12 @@ public class Review {
         this.rating = rating;
     }
 
+    public ReviewDTO toReviewDTO(){
+        return ReviewDTO.builder()
+                .content(content)
+                .rating(rating)
+                .schedulenum(schedulenum)
+                .usernum(usernum)
+                .build();
+    }
 }

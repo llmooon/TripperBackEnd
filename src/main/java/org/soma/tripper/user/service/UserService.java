@@ -10,5 +10,5 @@ public interface UserService {
 
     String registerUser(UserDTO userDTO);//user name 리턴.
     User login(String id, String password);
-    User isInEmail(String user_email);
+    User findUserByEmail(String user_email);
 }

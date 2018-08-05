@@ -37,7 +37,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if(userService.isInEmail(userDTO.getEmail())==null){
+        if(userService.findUserByEmail(userDTO.getEmail())==null){
             userService.registerUser(userDTO);
             return new ResponseEntity<>(userDTO.toEntity(),HttpStatus.CREATED);
         }
