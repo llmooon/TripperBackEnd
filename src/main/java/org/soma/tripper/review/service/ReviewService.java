@@ -1,6 +1,5 @@
 package org.soma.tripper.review.service;
 
-import org.soma.tripper.practice.Member;
 import org.soma.tripper.review.entity.Review;
 
 import java.util.List;
