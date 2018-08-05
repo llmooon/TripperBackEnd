@@ -1,2 +1,1 @@
--- insert into user(email,password) values('llmooon@naver.com','hs466831');
--- insert into user(email,password) values('llmooon2@naver.com','hs466831');
+-- insert into user(device_token,email,name,password,sex) values ("1","3","3","4",0);

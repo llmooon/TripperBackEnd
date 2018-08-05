@@ -9,6 +9,7 @@ import org.soma.tripper.user.domain.User;
 
 public class UserDTO {
 
+
     private String email;
     private String password;
     private String name;
@@ -32,5 +33,10 @@ public class UserDTO {
         this.name = name;
         this.sex = sex;
         this.device_token = device_token;
+    }
+    @Builder
+    public UserDTO(String email, String password){
+        this.email=email;
+        this.password=password;
     }
 }

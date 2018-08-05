@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.user.domain.User;
+import org.soma.tripper.user.dto.LoginUserDTO;
 import org.soma.tripper.user.dto.UserDTO;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if(userService.isInEmail(userDTO.getEmail())==null){
+        if(userService.findUserByEmail(userDTO.getEmail())==null){
             userService.registerUser(userDTO);
             return new ResponseEntity<>(userDTO.toEntity(),HttpStatus.CREATED);
         }
@@ -50,7 +51,8 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list"),
     })
-    public ResponseEntity<User> loginUser(@RequestBody UserDTO userDTO){
+    public ResponseEntity<User> loginUser(@RequestBody LoginUserDTO loginUserDTO){
+        UserDTO userDTO= loginUserDTO.toDTO(loginUserDTO);
         if(userDTO.getEmail()==null||userDTO.getPassword()==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         User user = userService.login(userDTO.getEmail(),userDTO.getPassword());
         if(user==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

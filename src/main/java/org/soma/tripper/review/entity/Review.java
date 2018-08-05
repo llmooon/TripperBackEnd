@@ -1,37 +1,61 @@
 package org.soma.tripper.review.entity;
 
 import lombok.*;
+import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
+@ToString
 @Entity
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private int review_num;
+    private int reviewnum;
 
-    @Column(name = "user_num")
-    private String user_num;
+    @Column(name = "usernum")
+    private int usernum;
+
+    @Column(name = "schedule_num")
+    private int schedulenum;
+
+    @Column(name = "content",length = 1000)
+    private String content;
 
     @Column(name="rating")
     private double rating;
 
-    @Column(name = "content")
-    private String content;
-
-    @Column(name="images")
-    private int images;
-
     @Column(name="ml_rating")
-    private double ml_rating;
+    private double mlrating;
 
-    @Builder Review(String user_num, double rating, String content){
-        this.user_num = user_num;
-        this.rating = rating;
-        this.content = content;
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinColumn(name = "reviewnum")
+    private Collection<Photo> photos;
+
+    public void addPhoto(Photo p){
+        if(photos==null){
+            photos=new ArrayList<>();
+        }
+        photos.add(p);
     }
 
+    @Builder Review(int usernum, int schedulenum, String content, double rating){
+        this.usernum=usernum;
+        this.usernum = schedulenum;
+        this.content=content;
+        this.rating = rating;
+    }
+
+    public ReviewDTO toReviewDTO(){
+        return ReviewDTO.builder()
+                .content(content)
+                .rating(rating)
+                .schedulenum(schedulenum)
+                .usernum(usernum)
+                .build();
+    }
 }

@@ -57,6 +57,11 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
 
 
+//s3
+   // compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.2.1'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.375'
+
     compile('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+
 }
