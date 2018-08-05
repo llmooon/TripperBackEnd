@@ -1,7 +1,6 @@
 package org.soma.tripper.review.entity;
 
 import lombok.*;
-import org.soma.tripper.practice.Phone;
 import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
