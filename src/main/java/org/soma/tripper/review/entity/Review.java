@@ -1,6 +1,8 @@
 package org.soma.tripper.review.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.soma.tripper.common.BaseTimeEntity;
 import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
@@ -12,7 +14,7 @@ import java.util.List;
 @ToString
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Review {
+public class Review extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int reviewnum;
@@ -31,6 +33,10 @@ public class Review {
 
     @Column(name="ml_rating")
     private double mlrating;
+
+    @JsonIgnore
+    @Column(name="view")
+    private int view;
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "reviewnum")

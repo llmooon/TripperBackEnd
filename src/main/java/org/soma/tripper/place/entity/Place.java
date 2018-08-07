@@ -12,7 +12,7 @@ import javax.persistence.Id;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Entity
-public class place {
+public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int place_num;
