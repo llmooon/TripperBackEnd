@@ -3,6 +3,7 @@ package org.soma.tripper.review.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.soma.tripper.common.BaseTimeEntity;
+import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
@@ -38,8 +39,8 @@ public class Review extends BaseTimeEntity {
     private int view;
 
 
-    @OneToOne
-    @JoinColumn(name="thumb_thumbnum")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="thumbnum")
     private Thumb thumb;
 
 
@@ -74,4 +75,13 @@ public class Review extends BaseTimeEntity {
                 .usernum(usernum)
                 .build();
     }
+    public MainReviewDTO toMainReviewDTO(){
+        return MainReviewDTO.builder()
+                .content(content)
+                .rating(rating)
+                .schedulenum(schedulenum)
+                .usernum(usernum)
+                .build();
+    }
+
 }

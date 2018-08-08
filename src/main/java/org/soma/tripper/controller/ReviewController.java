@@ -1,6 +1,7 @@
 package org.soma.tripper.controller;
 
 import org.soma.tripper.review.dto.ImagePath;
+import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.dto.PhotoDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
 import org.soma.tripper.review.entity.Photo;
@@ -99,25 +100,21 @@ public class ReviewController {
     }
 
     @GetMapping(value="/loadMainReviewByPaging/{page}")
-    public ResponseEntity<List<Review>> loadMainReviewByPaging(@PathVariable Integer page) throws IOException {
-        int size=10;
-        PageRequest request = new PageRequest(page,size,new Sort(Sort.Direction.DESC,"reviewnum"));
+    public ResponseEntity<List<MainReviewDTO>> loadMainReviewByPaging(@PathVariable Integer page) throws IOException {
+        int size = 10;
+        PageRequest request = new PageRequest(page, size, new Sort(Sort.Direction.ASC, "reviewnum"));
         Page<Review> result = reviewService.loadMainReviewByPage(request);
         List<Review> reviewList = result.getContent();
+        List<MainReviewDTO> reviewDTOList = new ArrayList<>();
 
-//        List<ReviewDTO> reviewDTOList = new ArrayList<>();
-//        for (Review r: reviewList) {
-//            Collection<Photo> photoList = r.getPhotos();
-//            List<byte[]> photos = new ArrayList<>();
-//
-//            ReviewDTO reviewDTO = r.toReviewDTO();
-//            for (Photo p: photoList) {
-//                photos.add(amazonClient.download(p.getBucket()));
-//            }
-//            reviewDTO.setPhotolist(photos);
-//            reviewDTOList.add(reviewDTO);
-//        }
-        return new ResponseEntity<>(reviewList,HttpStatus.OK);
+        for (Review r : reviewList) {
+            Thumb thumb = r.getThumb();
+            MainReviewDTO reviewDTO = r.toMainReviewDTO();
+            PhotoDTO photoDTO = amazonClient.download(thumb.getBucket());
+            reviewDTO.setPhotoDTO(photoDTO);
+            reviewDTOList.add(reviewDTO);
+        }
+            return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
+
     }
-
 }
