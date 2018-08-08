@@ -1,14 +1,20 @@
 package org.soma.tripper.controller;
 
+import org.soma.tripper.review.dto.ImagePath;
+import org.soma.tripper.review.dto.PhotoDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
 import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
+import org.soma.tripper.review.entity.Thumb;
 import org.soma.tripper.review.repository.PhotoRepository;
 import org.soma.tripper.review.service.AmazonClient;
 import org.soma.tripper.review.service.ReviewService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,10 +69,10 @@ public class ReviewController {
                 .usernum(usernum)
                 .build();
 
-
-        String dir = this.amazonClient.uploadFile(file);
+        ImagePath imagePath = this.amazonClient.uploadFile(file);
         Review review = reviewDTO.toReviewEntity();
-        review.addPhoto(Photo.builder().bucket(dir).build());
+        review.addPhoto(Photo.builder().bucket(imagePath.getDateName()+"/"+imagePath.getFileName()).build());
+        review.setThumb(Thumb.builder().bucket(imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
         Review result = reviewService.uploadReview(review);
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -80,7 +86,7 @@ public class ReviewController {
 
         for (Review r: reviewList) {
             Collection<Photo> photoList = r.getPhotos();
-            List<byte[]> photos = new ArrayList<>();
+            List<PhotoDTO> photos = new ArrayList<>();
 
             ReviewDTO reviewDTO = r.toReviewDTO();
             for (Photo p: photoList) {
@@ -92,8 +98,26 @@ public class ReviewController {
         return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
     }
 
-//    @GetMapping("/downloadFile")
-//    public ResponseEntity<byte[]> download() throws IOException {
-//        //return amazonClient.download();
-//    }
+    @GetMapping(value="/loadMainReviewByPaging/{page}")
+    public ResponseEntity<List<Review>> loadMainReviewByPaging(@PathVariable Integer page) throws IOException {
+        int size=10;
+        PageRequest request = new PageRequest(page,size,new Sort(Sort.Direction.DESC,"reviewnum"));
+        Page<Review> result = reviewService.loadMainReviewByPage(request);
+        List<Review> reviewList = result.getContent();
+
+//        List<ReviewDTO> reviewDTOList = new ArrayList<>();
+//        for (Review r: reviewList) {
+//            Collection<Photo> photoList = r.getPhotos();
+//            List<byte[]> photos = new ArrayList<>();
+//
+//            ReviewDTO reviewDTO = r.toReviewDTO();
+//            for (Photo p: photoList) {
+//                photos.add(amazonClient.download(p.getBucket()));
+//            }
+//            reviewDTO.setPhotolist(photos);
+//            reviewDTOList.add(reviewDTO);
+//        }
+        return new ResponseEntity<>(reviewList,HttpStatus.OK);
+    }
+
 }

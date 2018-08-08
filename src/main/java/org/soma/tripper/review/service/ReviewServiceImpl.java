@@ -3,6 +3,8 @@ package org.soma.tripper.review.service;
 import org.soma.tripper.review.entity.Review;
 import org.soma.tripper.review.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,6 +29,10 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.findAll();
     }
 
+    @Override
+    public Page<Review> loadMainReviewByPage(Pageable page) {
+        return reviewRepository.findAll(page);
+    }
 }
 
 

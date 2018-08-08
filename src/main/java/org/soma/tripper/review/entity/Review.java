@@ -34,13 +34,19 @@ public class Review extends BaseTimeEntity {
     @Column(name="ml_rating")
     private double mlrating;
 
-    @JsonIgnore
     @Column(name="view")
     private int view;
+
+
+    @OneToOne
+    @JoinColumn(name="thumb_thumbnum")
+    private Thumb thumb;
+
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "reviewnum")
     private Collection<Photo> photos;
+
 
     public void addPhoto(Photo p){
         if(photos==null){
@@ -54,6 +60,10 @@ public class Review extends BaseTimeEntity {
         this.usernum = schedulenum;
         this.content=content;
         this.rating = rating;
+    }
+
+    public void setThumb(Thumb thumb) {
+        this.thumb = thumb;
     }
 
     public ReviewDTO toReviewDTO(){

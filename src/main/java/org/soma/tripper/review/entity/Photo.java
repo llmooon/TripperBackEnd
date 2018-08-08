@@ -18,7 +18,7 @@ public class Photo {
     private String bucket;
 
     @Column(name="reviewnum")
-    private String reviewnum;
+    private int reviewnum;
 
     @Builder
     Photo(String bucket){
