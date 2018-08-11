@@ -2,6 +2,7 @@ package org.soma.tripper.review.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.http.HttpHeaders;
 import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,14 +17,13 @@ public class ReviewDTO {
     private int schedulenum;
     private String content;
     private double rating;
-    private List<byte[]> photolist;
-    //private List<MultipartFile> photolist;
+    private List<String> photolist;
 
     public ReviewDTO() {
         super();
     }
 
-    void addphoto(byte[] p){
+    void addphoto(String p){
         if(photolist==null){
             photolist=new ArrayList<>();
         }
@@ -35,7 +35,6 @@ public class ReviewDTO {
         this.schedulenum=schedulenum;
         this.content=content;
         this.rating=rating;
-        //this.photolist=photolist;
     }
 
     public Review toReviewEntity(){
@@ -47,7 +46,7 @@ public class ReviewDTO {
                 .build();
     }
 
-    public void setPhotolist(List<byte[]> photolist) {
+    public void setPhotolist(List<String> photolist) {
         this.photolist = photolist;
     }
 }

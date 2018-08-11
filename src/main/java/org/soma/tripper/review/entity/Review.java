@@ -1,14 +1,13 @@
 package org.soma.tripper.review.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.soma.tripper.common.BaseTimeEntity;
+import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Getter
 @ToString
@@ -34,13 +33,19 @@ public class Review extends BaseTimeEntity {
     @Column(name="ml_rating")
     private double mlrating;
 
-    @JsonIgnore
     @Column(name="view")
     private int view;
+
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="thumbnum")
+    private Thumb thumb;
+
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "reviewnum")
     private Collection<Photo> photos;
+
 
     public void addPhoto(Photo p){
         if(photos==null){
@@ -56,6 +61,10 @@ public class Review extends BaseTimeEntity {
         this.rating = rating;
     }
 
+    public void setThumb(Thumb thumb) {
+        this.thumb = thumb;
+    }
+
     public ReviewDTO toReviewDTO(){
         return ReviewDTO.builder()
                 .content(content)
@@ -64,4 +73,13 @@ public class Review extends BaseTimeEntity {
                 .usernum(usernum)
                 .build();
     }
+    public MainReviewDTO toMainReviewDTO(){
+        return MainReviewDTO.builder()
+                .content(content)
+                .rating(rating)
+                .schedulenum(schedulenum)
+                .usernum(usernum)
+                .build();
+    }
+
 }

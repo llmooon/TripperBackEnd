@@ -3,6 +3,7 @@ package org.soma.tripper.controller;
 import com.amazonaws.services.s3.AmazonS3Client;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.soma.tripper.review.dto.ImagePath;
 import org.soma.tripper.review.service.AmazonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class BucketController {
 
     @ApiOperation(value="Upload Files to S3")
     @PostMapping("/uploadFile")
-    public String uploadFile(@RequestPart(value="file")MultipartFile file){
+    public ImagePath uploadFile(@RequestPart(value="file")MultipartFile file){
         return this.amazonClient.uploadFile(file);
     }
 

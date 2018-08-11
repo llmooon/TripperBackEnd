@@ -6,15 +6,15 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
+import net.coobird.thumbnailator.Thumbnails;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.soma.tripper.review.dto.ImagePath;
+import org.soma.tripper.review.dto.PhotoDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,24 +48,41 @@ public class AmazonClient {
         this.s3client = new AmazonS3Client(credentials);
     }
 
-    public String uploadFile(MultipartFile multipartFile) {
+    public ImagePath uploadFile(MultipartFile multipartFile) {
+
         String fileUrl = "";
         String realbucket = bucketName;
         try {
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(multipartFile);
+            fileName = URLEncoder.encode(fileName,"UTF-8").replaceAll("\\+", "%20");
+
             DateTime date = new DateTime();
             String DateName = date.getYear() + "/" + date.getMonthOfYear() + "/" + date.getDayOfMonth();
             bucketName = bucketName.concat("/" + date.getYear() + "/" + date.getMonthOfYear() + "/" + date.getDayOfMonth());
-            fileUrl = DateName +"/"+ fileName;
             uploadFileTos3bucket(fileName, file);
+
+            String path = System.getProperty("user.dir");
+            File thumbnail = new File(path+"\\thumbnail.jpg");
+
+            thumbnail.getParentFile().mkdirs();
+            Thumbnails.of(file).size(190,150).outputFormat("jpg").toFile(thumbnail);
+            uploadThumbnailFileTos3bucket(fileName,thumbnail);
+            thumbnail.delete();
+
             file.delete();
             bucketName = realbucket;
+            ImagePath path1 = ImagePath.builder()
+                    .fileName(fileName)
+                    .dateName(DateName)
+                    .build();
+            return path1;
+
         } catch (Exception e) {
             e.printStackTrace();
             bucketName = realbucket;
         }
-        return fileUrl;
+        return null;
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
@@ -84,6 +101,10 @@ public class AmazonClient {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
+    private void uploadThumbnailFileTos3bucket(String fileName, File file) {
+        s3client.putObject(new PutObjectRequest(bucketName+"/thumb", fileName, file)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+    }
 
     public String deleteFileFromS3Bucket(String fileUrl) {
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
@@ -91,20 +112,22 @@ public class AmazonClient {
         return "Successfully deleted";
     }
 
-    public byte[] download(String key) throws IOException{
-
-        //String key="2018/8/5/1533445919579-it.pdf";
-        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName,key);
-        S3Object s3Object = s3client.getObject(getObjectRequest);
-        S3ObjectInputStream objectInputStream = s3Object.getObjectContent();
-        byte[] bytes = IOUtils.toByteArray(objectInputStream);
-        String fileName = URLEncoder.encode(key,"UTF-8").replaceAll("\\+", "%20");
-
+//    public PhotoDTO download(String key) throws IOException{
+//        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName,key);
+//        S3Object s3Object = s3client.getObject(getObjectRequest);
+//        S3ObjectInputStream objectInputStream = s3Object.getObjectContent();
+//        byte[] bytes = IOUtils.toByteArray(objectInputStream);
+//        String fileName = URLEncoder.encode(key,"UTF-8").replaceAll("\\+", "%20");
+//
 //        HttpHeaders httpHeaders = new HttpHeaders();
 //        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 //        httpHeaders.setContentLength(bytes.length);
 //        httpHeaders.setContentDispositionFormData("attachment", fileName);
-//        return new ResponseEntity<>(bytes, httpHeaders, HttpStatus.OK);
-        return bytes;
-    }
+//
+//        PhotoDTO photoDTO = PhotoDTO.builder()
+//                .httpHeaders(httpHeaders)
+//                .photo(bytes)
+//                .build();
+//        return photoDTO;
+//    }
 }
