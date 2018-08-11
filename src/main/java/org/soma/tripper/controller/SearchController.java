@@ -34,10 +34,9 @@ public class SearchController {
         return new ResponseEntity<>(search, HttpStatus.OK);
     }
 
-    @GetMapping(value="/makeDB")
+    @GetMapping(value="/makeSearchDbToPlaceDb")
     public void makePlaceDB(){
         List<Place> placeList = placeService.getAllPlace();
         searchService.MakeSearchDB(placeList);
     }
-
 }

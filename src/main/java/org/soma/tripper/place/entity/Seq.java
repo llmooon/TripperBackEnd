@@ -3,7 +3,6 @@ package org.soma.tripper.place.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.user.domain.User;
 
@@ -15,6 +14,7 @@ import java.util.Collection;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Seq {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int seqnum;
@@ -28,4 +28,5 @@ public class Seq {
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "seqnum")
     private Collection<Schedule> schedulelist;
+
 }
