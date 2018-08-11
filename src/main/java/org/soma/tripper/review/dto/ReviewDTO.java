@@ -17,13 +17,13 @@ public class ReviewDTO {
     private int schedulenum;
     private String content;
     private double rating;
-    private List<PhotoDTO> photolist;
+    private List<String> photolist;
 
     public ReviewDTO() {
         super();
     }
 
-    void addphoto(PhotoDTO p){
+    void addphoto(String p){
         if(photolist==null){
             photolist=new ArrayList<>();
         }
@@ -46,7 +46,7 @@ public class ReviewDTO {
                 .build();
     }
 
-    public void setPhotolist(List<PhotoDTO> photolist) {
+    public void setPhotolist(List<String> photolist) {
         this.photolist = photolist;
     }
 }

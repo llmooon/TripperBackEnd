@@ -16,9 +16,9 @@ public class MainReviewDTO {
     private int schedulenum;
     private String content;
     private double rating;
-    private PhotoDTO photoDTO;
+    private String photoDTO;
 
-    public void setPhotoDTO(PhotoDTO photoDTO) {
+    public void setPhotoDTO(String photoDTO) {
         this.photoDTO = photoDTO;
     }
 

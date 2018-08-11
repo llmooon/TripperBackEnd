@@ -1,6 +1,5 @@
 package org.soma.tripper.review.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.soma.tripper.common.BaseTimeEntity;
 import org.soma.tripper.review.dto.MainReviewDTO;
@@ -9,7 +8,6 @@ import org.soma.tripper.review.dto.ReviewDTO;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Getter
 @ToString

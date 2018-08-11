@@ -13,20 +13,10 @@ public class RegistReviewDTO {
         private int schedulenum;
         private String content;
         private double rating;
-   //     private List<MultipartFile> photolist;
 
         public RegistReviewDTO() {
             super();
         }
-
-//        @Builder
-//        RegistReviewDTO(int usernum, int schedulenum, String content, double rating, List<MultipartFile> photolist){
-//            this.usernum=usernum;
-//            this.schedulenum=schedulenum;
-//            this.content=content;
-//            this.rating=rating;
-//            this.photolist=photolist;
-//        }
 
         public ReviewDTO toReviewDTO(){
             return ReviewDTO.builder()

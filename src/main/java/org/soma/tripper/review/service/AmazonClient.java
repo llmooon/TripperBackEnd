@@ -55,6 +55,8 @@ public class AmazonClient {
         try {
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(multipartFile);
+            fileName = URLEncoder.encode(fileName,"UTF-8").replaceAll("\\+", "%20");
+
             DateTime date = new DateTime();
             String DateName = date.getYear() + "/" + date.getMonthOfYear() + "/" + date.getDayOfMonth();
             bucketName = bucketName.concat("/" + date.getYear() + "/" + date.getMonthOfYear() + "/" + date.getDayOfMonth());
@@ -110,26 +112,22 @@ public class AmazonClient {
         return "Successfully deleted";
     }
 
-    public PhotoDTO download(String key) throws IOException{
-
-        //String key="2018/8/5/1533445919579-it.pdf";
-        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName,key);
-        S3Object s3Object = s3client.getObject(getObjectRequest);
-        S3ObjectInputStream objectInputStream = s3Object.getObjectContent();
-        byte[] bytes = IOUtils.toByteArray(objectInputStream);
-        String fileName = URLEncoder.encode(key,"UTF-8").replaceAll("\\+", "%20");
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        httpHeaders.setContentLength(bytes.length);
-        httpHeaders.setContentDispositionFormData("attachment", fileName);
-
-        PhotoDTO photoDTO = PhotoDTO.builder()
-                .httpHeaders(httpHeaders)
-                .photo(bytes)
-                .build();
-
-
-        return photoDTO;
-    }
+//    public PhotoDTO download(String key) throws IOException{
+//        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName,key);
+//        S3Object s3Object = s3client.getObject(getObjectRequest);
+//        S3ObjectInputStream objectInputStream = s3Object.getObjectContent();
+//        byte[] bytes = IOUtils.toByteArray(objectInputStream);
+//        String fileName = URLEncoder.encode(key,"UTF-8").replaceAll("\\+", "%20");
+//
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//        httpHeaders.setContentLength(bytes.length);
+//        httpHeaders.setContentDispositionFormData("attachment", fileName);
+//
+//        PhotoDTO photoDTO = PhotoDTO.builder()
+//                .httpHeaders(httpHeaders)
+//                .photo(bytes)
+//                .build();
+//        return photoDTO;
+//    }
 }

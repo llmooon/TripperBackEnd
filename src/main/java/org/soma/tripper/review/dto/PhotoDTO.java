@@ -13,13 +13,13 @@ import java.util.List;
 @Setter
 public class PhotoDTO {
 
-    private byte[] photo;
+    private String photo;
     private HttpHeaders httpHeaders;
 
     public PhotoDTO(){}
 
     @Builder
-    public PhotoDTO(byte[] photo, HttpHeaders httpHeaders){
+    public PhotoDTO(String photo, HttpHeaders httpHeaders){
         this.photo=photo;
         this.httpHeaders=httpHeaders;
     }

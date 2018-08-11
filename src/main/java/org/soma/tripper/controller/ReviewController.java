@@ -72,8 +72,9 @@ public class ReviewController {
 
         ImagePath imagePath = this.amazonClient.uploadFile(file);
         Review review = reviewDTO.toReviewEntity();
-        review.addPhoto(Photo.builder().bucket(imagePath.getDateName()+"/"+imagePath.getFileName()).build());
-        review.setThumb(Thumb.builder().bucket(imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
+
+        review.addPhoto(Photo.builder().bucket("https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/"+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
+        review.setThumb(Thumb.builder().bucket("https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/"+imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
         Review result = reviewService.uploadReview(review);
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -87,11 +88,11 @@ public class ReviewController {
 
         for (Review r: reviewList) {
             Collection<Photo> photoList = r.getPhotos();
-            List<PhotoDTO> photos = new ArrayList<>();
+            List<String> photos = new ArrayList<>();
 
             ReviewDTO reviewDTO = r.toReviewDTO();
             for (Photo p: photoList) {
-                photos.add(amazonClient.download(p.getBucket()));
+                photos.add(p.getBucket());
             }
             reviewDTO.setPhotolist(photos);
             reviewDTOList.add(reviewDTO);
@@ -110,8 +111,8 @@ public class ReviewController {
         for (Review r : reviewList) {
             Thumb thumb = r.getThumb();
             MainReviewDTO reviewDTO = r.toMainReviewDTO();
-            PhotoDTO photoDTO = amazonClient.download(thumb.getBucket());
-            reviewDTO.setPhotoDTO(photoDTO);
+            String photoUrl = thumb.getBucket();
+            reviewDTO.setPhotoDTO(photoUrl);
             reviewDTOList.add(reviewDTO);
         }
             return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
