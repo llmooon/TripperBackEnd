@@ -7,14 +7,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PurposeDTO {
-    int days;
-    int shopping;
-    int food;
-    int tourist;
-    int culture;
-    int Entertainment;
-    boolean withChildren;
-    boolean withElderly;
-
-
+    private int usernum; // if use userName, change!
+    private int days;
+    private int shopping;
+    private int food;
+    private int tourist;
+    private int culture;
+    private int Entertainment;
+    private boolean withChildren;
+    private boolean withElderly;
 }

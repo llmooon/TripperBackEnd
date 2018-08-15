@@ -101,6 +101,7 @@ public class AmazonClient {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
+
     private void uploadThumbnailFileTos3bucket(String fileName, File file) {
         s3client.putObject(new PutObjectRequest(bucketName+"/thumb", fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
@@ -111,23 +112,4 @@ public class AmazonClient {
         s3client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
         return "Successfully deleted";
     }
-
-//    public PhotoDTO download(String key) throws IOException{
-//        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName,key);
-//        S3Object s3Object = s3client.getObject(getObjectRequest);
-//        S3ObjectInputStream objectInputStream = s3Object.getObjectContent();
-//        byte[] bytes = IOUtils.toByteArray(objectInputStream);
-//        String fileName = URLEncoder.encode(key,"UTF-8").replaceAll("\\+", "%20");
-//
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-//        httpHeaders.setContentLength(bytes.length);
-//        httpHeaders.setContentDispositionFormData("attachment", fileName);
-//
-//        PhotoDTO photoDTO = PhotoDTO.builder()
-//                .httpHeaders(httpHeaders)
-//                .photo(bytes)
-//                .build();
-//        return photoDTO;
-//    }
 }

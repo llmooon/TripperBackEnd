@@ -2,7 +2,6 @@ package org.soma.tripper.controller;
 
 import org.soma.tripper.review.dto.ImagePath;
 import org.soma.tripper.review.dto.MainReviewDTO;
-import org.soma.tripper.review.dto.PhotoDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
 import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
@@ -39,13 +38,14 @@ public class ReviewController {
     @Autowired
     PhotoRepository photoRepository;
 
-
     private AmazonClient amazonClient;
+
     @Autowired
     ReviewController(AmazonClient amazonClient){
         this.amazonClient=amazonClient;
     }
 
+    String s3Url = "https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/";
 
     @GetMapping("/userload/{userEmail}/{schedule_num}")
     public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail, @PathVariable int schedule_num){
@@ -54,11 +54,9 @@ public class ReviewController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-
     @PostMapping(value = "/upload")
     public ResponseEntity<ReviewDTO> uploadReview (@RequestParam String useremail, @RequestParam int schedulenum,
                                                    @RequestParam String content, @RequestParam double rating, @RequestParam  MultipartFile file){
-
         User user=userService.findUserByEmail(useremail);
         if(user==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         int usernum = user.getUser_num();
@@ -72,14 +70,12 @@ public class ReviewController {
 
         ImagePath imagePath = this.amazonClient.uploadFile(file);
         Review review = reviewDTO.toReviewEntity();
-
-        review.addPhoto(Photo.builder().bucket("https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/"+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
-        review.setThumb(Thumb.builder().bucket("https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/"+imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
-        Review result = reviewService.uploadReview(review);
+        review.addPhoto(Photo.builder().bucket(s3Url+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
+        review.setThumb(Thumb.builder().bucket(s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
+        reviewService.uploadReview(review);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 
     @GetMapping(value="/loadMainReview")
     public ResponseEntity<List<ReviewDTO>> loadMainReview() throws IOException {
@@ -103,7 +99,7 @@ public class ReviewController {
     @GetMapping(value="/loadMainReviewByPaging/{page}")
     public ResponseEntity<List<MainReviewDTO>> loadMainReviewByPaging(@PathVariable Integer page) throws IOException {
         int size = 10;
-        PageRequest request = new PageRequest(page, size, new Sort(Sort.Direction.ASC, "reviewnum"));
+        PageRequest request = PageRequest.of(page, size, new Sort(Sort.Direction.ASC, "reviewnum"));
         Page<Review> result = reviewService.loadMainReviewByPage(request);
         List<Review> reviewList = result.getContent();
         List<MainReviewDTO> reviewDTOList = new ArrayList<>();
@@ -115,7 +111,7 @@ public class ReviewController {
             reviewDTO.setPhotoDTO(photoUrl);
             reviewDTOList.add(reviewDTO);
         }
-            return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
 
+        return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
     }
 }
