@@ -2,6 +2,7 @@ package org.soma.tripper.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.SearchService;
 import org.soma.tripper.place.entity.Place;
@@ -29,12 +30,12 @@ public class SearchController {
     @GetMapping(value = "/{region}")
     @ApiOperation(value="Search Region",notes = "지역 검색")
     public ResponseEntity<Search> searchwhere(@PathVariable String region){
-        Search search = searchService.SearchRegion(region);
-        if(search==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Search search = searchService.SearchRegion(region).orElseThrow(()->new NoSuchDataException("서비스 준비중입니다."));
         return new ResponseEntity<>(search, HttpStatus.OK);
     }
 
     @GetMapping(value="/makeSearchDbToPlaceDb")
+    @ApiOperation(value="Make Search DB",notes = "장소 DB를 Search DB에 저장합니다. 주변 인근 지역을 추천하기 위해 따로 두었습니다.")
     public void makePlaceDB(){
         List<Place> placeList = placeService.getAllPlace();
         searchService.MakeSearchDB(placeList);

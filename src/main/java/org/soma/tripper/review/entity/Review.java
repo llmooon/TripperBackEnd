@@ -56,7 +56,7 @@ public class Review extends BaseTimeEntity {
 
     @Builder Review(int usernum, int schedulenum, String content, double rating){
         this.usernum=usernum;
-        this.usernum = schedulenum;
+        this.schedulenum = schedulenum;
         this.content=content;
         this.rating = rating;
     }
