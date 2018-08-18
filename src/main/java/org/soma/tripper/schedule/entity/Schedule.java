@@ -26,5 +26,4 @@ public class Schedule {
     @JoinColumn(name = "placenum")
     private Place place;
 
-
 }

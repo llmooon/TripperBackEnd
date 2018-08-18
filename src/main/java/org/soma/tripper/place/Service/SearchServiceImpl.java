@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -21,8 +22,8 @@ public class SearchServiceImpl implements SearchService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public Search SearchRegion(String name){
-        return searchRepository.findByName(name);
+    public Optional<Search> SearchRegion(String name){
+        return Optional.ofNullable(searchRepository.findByName(name));
     }
 
     @Override

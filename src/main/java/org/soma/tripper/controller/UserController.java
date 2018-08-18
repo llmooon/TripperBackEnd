@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.dto.LoginUserDTO;
 import org.soma.tripper.user.dto.UserDTO;
@@ -35,6 +36,7 @@ public class UserController {
         if(userDTO.getEmail()==null || userDTO.getPassword()==null || userDTO.getDevice_token()==null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         if(userService.findUserByEmail(userDTO.getEmail())==null){
             userService.registerUser(userDTO);
             return new ResponseEntity<>(userDTO.toEntity(),HttpStatus.CREATED);
@@ -50,10 +52,10 @@ public class UserController {
     public ResponseEntity<User> loginUser(@RequestBody LoginUserDTO loginUserDTO){
         UserDTO userDTO= loginUserDTO.toDTO(loginUserDTO);
         if(userDTO.getEmail()==null||userDTO.getPassword()==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        User user = userService.login(userDTO.getEmail(),userDTO.getPassword());
-        if(user==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        User user = userService.login(userDTO.getEmail(),userDTO.getPassword())
+                .orElseThrow(()->new NoSuchDataException("회원 정보가 일치하지 않습니다."));
+
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
-
-
 }

@@ -2,6 +2,7 @@ package org.soma.tripper.review.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.apache.http.HttpHeaders;
 import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 @Getter
 public class ReviewDTO {
     private int usernum;

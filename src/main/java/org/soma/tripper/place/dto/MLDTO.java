@@ -23,8 +23,8 @@ public class MLDTO {
     private boolean withElderly;
 
     @Builder
-    public MLDTO(PurposeDTO purposeDTO, Optional<User> user){
-        this.sex = user.get().getSex();
+    public MLDTO(PurposeDTO purposeDTO, User user){
+        this.sex = user.getSex();
         //this.age = user.getAge();     if add age, Add!
         this.days = purposeDTO.getDays();
         this.shopping = purposeDTO.getShopping();

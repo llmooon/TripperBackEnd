@@ -1,5 +1,7 @@
 package org.soma.tripper.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.soma.tripper.review.dto.ImagePath;
 import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
@@ -46,6 +48,7 @@ public class ReviewController {
     }
 
     String s3Url = "https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/";
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @GetMapping("/userload/{userEmail}/{schedule_num}")
     public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail, @PathVariable int schedule_num){
