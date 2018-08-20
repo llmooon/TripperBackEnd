@@ -25,6 +25,4 @@ public class Place {
     private double longtitude;
     private int price;
     private String type;
-
-
 }
