@@ -10,17 +10,14 @@ import javax.persistence.*;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Thumb {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int thumbnum;
 
     @Column(name="bucket")
     private String bucket;
-
-    public Thumb(){
-
-    }
     @Builder
     Thumb(String bucket){
         this.bucket=bucket;
