@@ -9,7 +9,6 @@ import org.soma.tripper.user.domain.User;
 
 public class UserDTO {
 
-
     private String email;
     private String password;
     private String name;

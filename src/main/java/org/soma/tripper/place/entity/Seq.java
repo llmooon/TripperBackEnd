@@ -1,17 +1,17 @@
 package org.soma.tripper.place.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.user.domain.User;
 
 import javax.persistence.*;
 import java.sql.Date;
-import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Seq {
 
@@ -27,6 +27,22 @@ public class Seq {
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "seqnum")
-    private Collection<Schedule> schedulelist;
+    private List<Schedule> schedulelist;
 
+
+    @Builder
+    public Seq(User user,List<Schedule> schedulelist){
+        this.user = user;
+        this.schedulelist=schedulelist;
+    }
+
+    public SeqDTO toDTO(){
+        return SeqDTO.builder()
+                .seqnum(this.getSeqnum())
+                .fromdate(this.getFromdate())
+                .toDate(this.getToDate())
+                .usernum(this.getSeqnum())
+                .schedulelist(this.getSchedulelist())
+                .build();
+    }
 }
