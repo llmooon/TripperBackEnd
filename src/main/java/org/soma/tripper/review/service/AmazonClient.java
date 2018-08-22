@@ -63,12 +63,15 @@ public class AmazonClient {
             uploadFileTos3bucket(fileName, file);
 
             String path = System.getProperty("user.dir");
-            File thumbnail = new File(path+"\\thumbnail.jpg");
+//            File thumbnail = new File(path+"\\thumbnail.jpg");
+//
+//            thumbnail.getParentFile().mkdirs();
+//            Thumbnails.of(file).size(190,150).outputFormat("jpg").toFile(thumbnail);
+//            uploadThumbnailFileTos3bucket(fileName,thumbnail);
+//            thumbnail.delete();
 
-            thumbnail.getParentFile().mkdirs();
-            Thumbnails.of(file).size(190,150).outputFormat("jpg").toFile(thumbnail);
+            File thumbnail = file;
             uploadThumbnailFileTos3bucket(fileName,thumbnail);
-            thumbnail.delete();
 
             file.delete();
             bucketName = realbucket;
