@@ -2,6 +2,7 @@ package org.soma.tripper.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.review.dto.ImagePath;
 import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
@@ -86,10 +87,13 @@ public class ReviewController {
         List<ReviewDTO> reviewDTOList = new ArrayList<>();
 
         for (Review r: reviewList) {
+            User user = userService.findUserByUsernum(r.getUsernum()).orElseThrow(()->new NoSuchDataException());
+
             Collection<Photo> photoList = r.getPhotos();
             List<String> photos = new ArrayList<>();
 
             ReviewDTO reviewDTO = r.toReviewDTO();
+            reviewDTO.setUserEmail(user.getEmail());
             for (Photo p: photoList) {
                 photos.add(p.getBucket());
             }
