@@ -71,6 +71,7 @@ public class Review extends BaseTimeEntity {
                 .rating(rating)
                 .schedulenum(schedulenum)
                 .usernum(usernum)
+                .createTime(getCreatedDate())
                 .build();
     }
     public MainReviewDTO toMainReviewDTO(){
