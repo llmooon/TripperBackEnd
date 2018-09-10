@@ -2,6 +2,7 @@ package org.soma.tripper.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.soma.tripper.user.dto.UserDTO;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -39,4 +40,14 @@ public class User implements Serializable {
     }
 
     public User(){}
+
+    public UserDTO toDTO(){
+        return UserDTO.builder()
+                .email(email)
+                .name(name)
+                .password(null)
+                .device_token(device_token)
+                .sex(sex)
+                .build();
+    }
 }

@@ -22,14 +22,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional//위치가 여기가 맞는가
-    public String registerUser(UserDTO userDTO) {
-        try{
-          User user = userRepository.save(userDTO.toEntity());
-        }
-        catch (Exception e){
-            throw new NullPointerException("npe"); //널 값, 중복 값 예외 처리 하기
-        }
-        return userDTO.toString();
+    public Optional<User> registerUser(UserDTO userDTO) {
+        return Optional.of(userRepository.save(userDTO.toEntity()));
     }
 
     @Override
@@ -38,7 +32,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User findUserByEmail(String user_email) {
+    public Optional<User> findUserByEmail(String user_email) {
         return userRepository.findByEmail(user_email);
     }
 

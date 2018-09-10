@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PurposeDTO {
-    private int usernum; // if use userName, change!
+    private String user; // if use userName, change!
     private int region;
     private int days;
     private int shopping;

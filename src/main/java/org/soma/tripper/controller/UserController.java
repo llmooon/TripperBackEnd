@@ -32,16 +32,17 @@ public class UserController {
     @PostMapping("/create")
     @ApiOperation(value="Register user",notes = "회원가입")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO){ // 나중에 validator 사용해보기.
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO){ // 나중에 validator 사용해보기.
         if(userDTO.getEmail()==null || userDTO.getPassword()==null || userDTO.getDevice_token()==null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        if(userService.findUserByEmail(userDTO.getEmail())==null){
-            userService.registerUser(userDTO);
-            return new ResponseEntity<>(userDTO.toEntity(),HttpStatus.CREATED);
+        if(userService.findUserByEmail(userDTO.getEmail()).isPresent()){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        User user = userService.registerUser(userDTO).get();
+        userDTO=user.toDTO();
+        return new ResponseEntity<>(userDTO,HttpStatus.CREATED);
+
     }
 
     @PostMapping("/login")
