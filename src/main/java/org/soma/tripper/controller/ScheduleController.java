@@ -54,7 +54,7 @@ public class ScheduleController {
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력받지만, ml이랑 한번 이야기 해 봐야할듯. 시간순대로 정렬해서 줌.")
     @PostMapping("/inputPurpose")
     public ResponseEntity<SeqDTO> sendPurpose(@RequestBody PurposeDTO purposeDTO){
-        User user = userService.findUserByUsernum(purposeDTO.getUsernum()).orElseThrow(()->new NoSuchDataException("회원 정보가 없습니다."));
+        User user = userService.findUserByEmail(purposeDTO.getUser()).orElseThrow(()->new NoSuchDataException("회원 정보가 없습니다."));
 
         MLDTO mldto = MLDTO.builder()
                 .purposeDTO(purposeDTO)

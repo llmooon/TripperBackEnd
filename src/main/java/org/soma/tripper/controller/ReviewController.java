@@ -53,7 +53,8 @@ public class ReviewController {
 
     @GetMapping("/userload/{userEmail}/{schedule_num}")
     public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail, @PathVariable int schedule_num){
-        int userNum = userService.findUserByEmail(userEmail).getUser_num(); // 나중에 고치기,,,
+        int userNum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
+        //int userNum = userService.findUserByEmail(userEmail).getUser_num(); // 나중에 고치기,,,
         List<Review> reviews = reviewService.loadReview(userNum,schedule_num);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
@@ -61,7 +62,7 @@ public class ReviewController {
     @PostMapping(value = "/upload")
     public ResponseEntity<ReviewDTO> uploadReview (@RequestParam String useremail, @RequestParam int schedulenum,
                                                    @RequestParam String content, @RequestParam double rating, @RequestParam  MultipartFile file){
-        User user=userService.findUserByEmail(useremail);
+        User user=userService.findUserByEmail(useremail).orElseThrow(()->new NoSuchDataException());
         if(user==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         int usernum = user.getUser_num();
 
