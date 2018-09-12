@@ -51,8 +51,8 @@ public class ScheduleController {
     @Autowired
     SeqService seqService;
 
-    @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력받지만, ml이랑 한번 이야기 해 봐야할듯. 시간순대로 정렬해서 줌.")
-    @PostMapping("/inputPurpose")
+    @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
+    @GetMapping("/sendSchedule")
     public ResponseEntity<SeqDTO> sendPurpose(@RequestBody PurposeDTO purposeDTO){
         User user = userService.findUserByEmail(purposeDTO.getUser()).orElseThrow(()->new NoSuchDataException("회원 정보가 없습니다."));
 
@@ -62,14 +62,24 @@ public class ScheduleController {
                 .build();
 
         List<Schedule> scheduleList = makeSchedule(sendML(mldto));
-        Seq seq = seqService.insertSeq(Seq.builder()
-                                .schedulelist(scheduleList)
-                                .user(user)
-                                .build());
+        Seq seq = Seq.builder()
+                .schedulelist(scheduleList)
+                .user(user)
+                .build();
 
         return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
-
     }
+
+    @ApiOperation(value="add Schedule",notes = "Zepplin Schedule 화면에서 스케줄 조정 후 완료 누른후.")
+    @PostMapping("addSchedule")
+    public void addSchedule(@RequestBody SeqDTO seqDTO){
+        User user = userService.findUserByUsernum(seqDTO.getUsernum()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+        Seq seq = seqService.insertSeq(Seq.builder()
+        .schedulelist(seqDTO.getSchedulelist())
+                .user(user)
+                .build());
+    }
+
 
     @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
     @GetMapping("/testML")
