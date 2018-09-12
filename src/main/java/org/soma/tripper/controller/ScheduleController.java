@@ -52,7 +52,7 @@ public class ScheduleController {
     SeqService seqService;
 
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
-    @GetMapping("/sendSchedule")
+    @PostMapping("/sendSchedule")
     public ResponseEntity<SeqDTO> sendPurpose(@RequestBody PurposeDTO purposeDTO){
         User user = userService.findUserByEmail(purposeDTO.getUser()).orElseThrow(()->new NoSuchDataException("회원 정보가 없습니다."));
 
@@ -71,15 +71,34 @@ public class ScheduleController {
     }
 
     @ApiOperation(value="add Schedule",notes = "Zepplin Schedule 화면에서 스케줄 조정 후 완료 누른후.")
-    @PostMapping("addSchedule")
-    public void addSchedule(@RequestBody SeqDTO seqDTO){
-        User user = userService.findUserByUsernum(seqDTO.getUsernum()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
-        Seq seq = seqService.insertSeq(Seq.builder()
-        .schedulelist(seqDTO.getSchedulelist())
+    @PostMapping("add")
+    public ResponseEntity<Seq> addSchedule(@RequestBody SeqDTO seqDTO){
+        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+
+        Seq seq = Seq.builder()
+                .schedulelist(seqDTO.getSchedulelist())
                 .user(user)
-                .build());
+                .build();
+        logger.info(seq.toString());
+        return new ResponseEntity<>(seq,HttpStatus.OK);
+//
+//        seqService.insertSeq(Seq.builder()
+//                             .schedulelist(seqDTO.getSchedulelist())
+//                             .user(user)
+//                             .build());
     }
 
+    @ApiOperation(value="update Schedule",notes = "계획 수정")
+    @PostMapping("/update")
+    public void updateSchedule(@RequestBody SeqDTO seqDTO){
+        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+        Seq seq = Seq.builder()
+                .schedulelist(seqDTO.getSchedulelist())
+                .user(user)
+                .seqnum(seqDTO.getSeqnum())
+                .build();
+        seqService.modifySeq(seq);
+    }
 
     @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
     @GetMapping("/testML")

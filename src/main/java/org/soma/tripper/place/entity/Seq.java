@@ -31,9 +31,14 @@ public class Seq {
 
 
     @Builder
-    public Seq(User user,List<Schedule> schedulelist){
+    public Seq(int seqnum,User user,List<Schedule> schedulelist){
+        this.seqnum=seqnum;
         this.user = user;
         this.schedulelist=schedulelist;
+    }
+
+    public void setSchedulelist(List<Schedule> schedulelist) {
+        this.schedulelist = schedulelist;
     }
 
     public SeqDTO toDTO(){
@@ -41,7 +46,7 @@ public class Seq {
                 .seqnum(this.getSeqnum())
                 .fromdate(this.getFromdate())
                 .toDate(this.getToDate())
-                .usernum(this.getSeqnum())
+                .user(this.user.getEmail())
                 .schedulelist(this.getSchedulelist())
                 .build();
     }

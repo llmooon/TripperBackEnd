@@ -1,5 +1,6 @@
 package org.soma.tripper.schedule.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,10 +14,11 @@ import java.sql.Date;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Schedule {
+    @JsonIgnore
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     int schedulenum;
-    int seqnum;
+    //int seqnum;
     int day;
     Date startTime;
 
@@ -30,7 +32,8 @@ public class Schedule {
 
 
     @Builder
-    public Schedule(int day,Place place){
+    public Schedule(int schedulenum,int day,Place place){
+        this.schedulenum=schedulenum;
         this.day=day;
         this.place=place;
     }

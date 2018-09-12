@@ -4,4 +4,5 @@ import org.soma.tripper.place.entity.Seq;
 
 public interface SeqService {
     Seq insertSeq(Seq seq);
+    Seq modifySeq(Seq seq);
 }
