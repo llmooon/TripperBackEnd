@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @ToString
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Seq {
 
     @Id
@@ -21,7 +21,7 @@ public class Seq {
     private Date fromdate;
     private Date toDate;
 
-    @ManyToOne(targetEntity = User.class,fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = User.class,fetch = FetchType.EAGER)
     @JoinColumn(name="usernum")
     private User user;
 

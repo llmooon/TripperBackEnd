@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ScheduleService {
     List<Schedule> findAllSchedule();
+    void saveScheduleList(List<Schedule> scheduleList);
+    void saveSchedule(Schedule schedule);
 }

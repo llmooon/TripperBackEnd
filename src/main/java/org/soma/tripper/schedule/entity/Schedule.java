@@ -18,18 +18,13 @@ public class Schedule {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     int schedulenum;
-    //int seqnum;
     int day;
+    int seqnum;
     Date startTime;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "placenum")
     private Place place;
-
-//    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-//    @JoinColumn(name = "schedulenum")
-//    private List<Schedule> schedulelist;
-
 
     @Builder
     public Schedule(int schedulenum,int day,Place place){
@@ -37,5 +32,4 @@ public class Schedule {
         this.day=day;
         this.place=place;
     }
-
 }

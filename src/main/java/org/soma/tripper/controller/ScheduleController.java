@@ -52,8 +52,8 @@ public class ScheduleController {
     SeqService seqService;
 
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
-    @PostMapping("/sendSchedule")
-    public ResponseEntity<SeqDTO> sendPurpose(@RequestBody PurposeDTO purposeDTO){
+    @PostMapping("/inputPurpose")
+    public ResponseEntity<SeqDTO> inputPurpose(@RequestBody PurposeDTO purposeDTO){
         User user = userService.findUserByEmail(purposeDTO.getUser()).orElseThrow(()->new NoSuchDataException("회원 정보가 없습니다."));
 
         MLDTO mldto = MLDTO.builder()
@@ -79,13 +79,9 @@ public class ScheduleController {
                 .schedulelist(seqDTO.getSchedulelist())
                 .user(user)
                 .build();
-        logger.info(seq.toString());
+
+        seqService.insertSeq(seq);
         return new ResponseEntity<>(seq,HttpStatus.OK);
-//
-//        seqService.insertSeq(Seq.builder()
-//                             .schedulelist(seqDTO.getSchedulelist())
-//                             .user(user)
-//                             .build());
     }
 
     @ApiOperation(value="update Schedule",notes = "계획 수정")

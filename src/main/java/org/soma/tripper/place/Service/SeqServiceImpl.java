@@ -19,7 +19,7 @@ public class SeqServiceImpl implements  SeqService{
     @Override
     public Seq modifySeq(Seq seq) {
         Seq before = seqRepository.findSeqBySeqnum(seq.getSeqnum()).orElseThrow(()->new NoSuchDataException());
-        before.setSchedulelist(seq.getSchedulelist());
+       // before.setSchedulelist(seq.getSchedulelist());
         seqRepository.save(before);
         return before;
     }
