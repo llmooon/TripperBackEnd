@@ -72,7 +72,7 @@ public class ScheduleController {
 
     @ApiOperation(value="add Schedule",notes = "Zepplin Schedule 화면에서 스케줄 조정 후 완료 누른후.")
     @PostMapping("add")
-    public ResponseEntity<Seq> addSchedule(@RequestBody SeqDTO seqDTO){
+    public ResponseEntity<SeqDTO> addSchedule(@RequestBody SeqDTO seqDTO){
         User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
 
         Seq seq = Seq.builder()
@@ -81,19 +81,19 @@ public class ScheduleController {
                 .build();
 
         seqService.insertSeq(seq);
-        return new ResponseEntity<>(seq,HttpStatus.OK);
+        SeqDTO result = seq.toDTO();
+        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
     @ApiOperation(value="update Schedule",notes = "계획 수정")
-    @PostMapping("/update")
-    public void updateSchedule(@RequestBody SeqDTO seqDTO){
+    @PutMapping("/update")
+    public ResponseEntity<SeqDTO> updateSchedule(@RequestBody SeqDTO seqDTO){
         User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
-        Seq seq = Seq.builder()
-                .schedulelist(seqDTO.getSchedulelist())
-                .user(user)
-                .seqnum(seqDTO.getSeqnum())
-                .build();
-        seqService.modifySeq(seq);
+        Seq seq = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("스케쥴 정보가 없습니다."));
+
+        seq.setSchedulelist(seqDTO.getSchedulelist());
+        seqService.insertSeq(seq);
+        return new ResponseEntity<>(seqDTO,HttpStatus.OK);
     }
 
     @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")

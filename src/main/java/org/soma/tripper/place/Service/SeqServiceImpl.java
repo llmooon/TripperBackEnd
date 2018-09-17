@@ -6,6 +6,8 @@ import org.soma.tripper.place.repository.SeqRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class SeqServiceImpl implements  SeqService{
     @Autowired
@@ -22,5 +24,10 @@ public class SeqServiceImpl implements  SeqService{
        // before.setSchedulelist(seq.getSchedulelist());
         seqRepository.save(before);
         return before;
+    }
+
+    @Override
+    public Optional<Seq> loadSeq(int seqnum) {
+        return seqRepository.findSeqBySeqnum(seqnum);
     }
 }
