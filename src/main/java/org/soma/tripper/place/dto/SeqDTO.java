@@ -1,9 +1,6 @@
 package org.soma.tripper.place.dto;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.schedule.entity.Schedule;
@@ -15,6 +12,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class SeqDTO {
     private int seqnum;
     private Date fromdate;
@@ -30,6 +28,7 @@ public class SeqDTO {
         this.user=user;
         this.schedulelist=schedulelist;
     }
+
 }
 
 

@@ -16,6 +16,7 @@ import java.util.List;
 public class Seq {
 
     @Id
+    @Column(name = "seqnum")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int seqnum;
     private Date fromdate;
@@ -31,10 +32,12 @@ public class Seq {
 
 
     @Builder
-    public Seq(int seqnum,User user,List<Schedule> schedulelist){
+    public Seq(int seqnum,User user,List<Schedule> schedulelist,Date fromdate, Date toDate){
         this.seqnum=seqnum;
         this.user = user;
         this.schedulelist=schedulelist;
+        this.fromdate=fromdate;
+        this.toDate=toDate;
     }
 
     public void setSchedulelist(List<Schedule> schedulelist) {

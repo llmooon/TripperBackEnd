@@ -1,6 +1,5 @@
 package org.soma.tripper.controller;
 
-import com.amazonaws.services.mq.model.BadRequestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.http.client.HttpClient;
@@ -26,10 +25,8 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/schedule")
@@ -70,6 +67,18 @@ public class ScheduleController {
         return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
+    @ApiOperation(value = "load Schedule",notes = "유저별 스케쥴 로드")
+    @GetMapping("load/{userid}")
+    public ResponseEntity<List<SeqDTO>> loadSchedule(@PathVariable String userid){
+        User user = userService.findUserByEmail(userid).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+        List<Seq> seqList = seqService.loadSeqByUser(user).orElseThrow(()->new NoSuchDataException("빔"));
+        List<SeqDTO> seqDTOList=new ArrayList<>();
+        for (Seq seq:seqList ) {
+            seqDTOList.add(seq.toDTO());
+        }
+        return new ResponseEntity<>(seqDTOList,HttpStatus.OK);
+    }
+
     @ApiOperation(value="add Schedule",notes = "Zepplin Schedule 화면에서 스케줄 조정 후 완료 누른후.")
     @PostMapping("add")
     public ResponseEntity<SeqDTO> addSchedule(@RequestBody SeqDTO seqDTO){
@@ -80,20 +89,27 @@ public class ScheduleController {
                 .user(user)
                 .build();
 
-        seqService.insertSeq(seq);
-        SeqDTO result = seq.toDTO();
-        return new ResponseEntity<>(result,HttpStatus.OK);
+        Seq result  = seqService.insertSeq(seq);
+        return new ResponseEntity<>(result.toDTO(),HttpStatus.OK);
     }
 
     @ApiOperation(value="update Schedule",notes = "계획 수정")
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<SeqDTO> updateSchedule(@RequestBody SeqDTO seqDTO){
         User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
-        Seq seq = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("스케쥴 정보가 없습니다."));
+        Seq info = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("없는 정보"));
+        seqService.deleteSeq(seqDTO.getSeqnum());
 
-        seq.setSchedulelist(seqDTO.getSchedulelist());
-        seqService.insertSeq(seq);
-        return new ResponseEntity<>(seqDTO,HttpStatus.OK);
+        Seq seq = seqService.insertSeq(
+                Seq.builder()
+                .user(user)
+                .schedulelist(seqDTO.getSchedulelist())
+                .fromdate(seqDTO.getFromdate())
+                .toDate(seqDTO.getToDate())
+                .build()
+        );
+
+       return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
     @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")

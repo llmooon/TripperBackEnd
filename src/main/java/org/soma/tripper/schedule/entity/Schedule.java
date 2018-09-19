@@ -22,7 +22,7 @@ public class Schedule {
     int seqnum;
     Date startTime;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne//(cascade = CascadeType.MERGE)
     @JoinColumn(name = "placenum")
     private Place place;
 
