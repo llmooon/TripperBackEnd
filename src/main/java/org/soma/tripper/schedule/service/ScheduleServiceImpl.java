@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -28,5 +29,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         for (Schedule s: scheduleList ) {
             scheduleRepository.save(s);
         }
+    }
+
+    @Override
+    public Optional<Schedule> findScheduleById(int id) {
+        return scheduleRepository.findById(id);
     }
 }

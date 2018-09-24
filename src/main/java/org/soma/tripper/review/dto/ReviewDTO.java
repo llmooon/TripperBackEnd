@@ -27,6 +27,9 @@ public class ReviewDTO {
     private List<String> photolist;
     private LocalDateTime createTime;
 
+    @JsonIgnore
+    private int placenum;
+
     public ReviewDTO() {
         super();
     }
@@ -38,13 +41,14 @@ public class ReviewDTO {
         photolist.add(p);
     }
 
-    @Builder ReviewDTO(String userEmail, int usernum, int schedulenum, String content, double rating, LocalDateTime createTime){
+    @Builder ReviewDTO(String userEmail, int usernum, int schedulenum, String content, double rating, LocalDateTime createTime,int placenum){
         this.userEmail=userEmail;
         this.usernum=usernum;
         this.schedulenum=schedulenum;
         this.content=content;
         this.rating=rating;
         this.createTime=createTime;
+        this.placenum=placenum;
     }
 
     public Review toReviewEntity(){
@@ -53,6 +57,7 @@ public class ReviewDTO {
                 .schedulenum(schedulenum)
                 .content(content)
                 .rating(rating)
+                .placenum(placenum)
                 .build();
     }
 

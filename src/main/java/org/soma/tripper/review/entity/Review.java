@@ -36,6 +36,7 @@ public class Review extends BaseTimeEntity {
     @Column(name="view")
     private int view;
 
+    private int placenum;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="thumbnum")
@@ -54,11 +55,12 @@ public class Review extends BaseTimeEntity {
         photos.add(p);
     }
 
-    @Builder Review(int usernum, int schedulenum, String content, double rating){
+    @Builder Review(int usernum, int schedulenum, String content, double rating,int placenum){
         this.usernum=usernum;
         this.schedulenum = schedulenum;
         this.content=content;
         this.rating = rating;
+        this.placenum=placenum;
     }
 
     public void setThumb(Thumb thumb) {
@@ -79,7 +81,6 @@ public class Review extends BaseTimeEntity {
                 .content(content)
                 .rating(rating)
                 .schedulenum(schedulenum)
-                .usernum(usernum)
                 .build();
     }
 

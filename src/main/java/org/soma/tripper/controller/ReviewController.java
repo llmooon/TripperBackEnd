@@ -1,5 +1,6 @@
 package org.soma.tripper.controller;
 
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
@@ -10,8 +11,10 @@ import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
 import org.soma.tripper.review.entity.Thumb;
 import org.soma.tripper.review.repository.PhotoRepository;
+import org.soma.tripper.review.repository.ReviewRepository;
 import org.soma.tripper.review.service.AmazonClient;
 import org.soma.tripper.review.service.ReviewService;
+import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +26,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.jws.soap.SOAPBinding;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/review")
@@ -41,6 +46,9 @@ public class ReviewController {
     @Autowired
     PhotoRepository photoRepository;
 
+    @Autowired
+    ScheduleService scheduleService;
+
     private AmazonClient amazonClient;
 
     @Autowired
@@ -51,57 +59,46 @@ public class ReviewController {
     String s3Url = "https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/";
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @GetMapping("/userload/{userEmail}/{schedule_num}")
-    public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail, @PathVariable int schedule_num){
+    @GetMapping("/userload/{userEmail}")
+    public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail){
         int userNum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
-        //int userNum = userService.findUserByEmail(userEmail).getUser_num(); // 나중에 고치기,,,
-        List<Review> reviews = reviewService.loadReview(userNum,schedule_num);
-        return new ResponseEntity<>(reviews, HttpStatus.OK);
+        List<Review> reviews = reviewService.loadReviewByUser(userNum);
+        return new ResponseEntity<>(reviews,HttpStatus.OK);
     }
 
-    @PostMapping(value = "/upload")
+    @ApiOperation(value="upload review only content",notes = "사진을 제외한 콘텐츠 업로드")
+    @PostMapping(value = "/uploadContent")
     public ResponseEntity<ReviewDTO> uploadReview (@RequestParam String useremail, @RequestParam int schedulenum,
-                                                   @RequestParam String content, @RequestParam double rating, @RequestParam  MultipartFile file){
-        User user=userService.findUserByEmail(useremail).orElseThrow(()->new NoSuchDataException());
-        if(user==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        int usernum = user.getUser_num();
+                                                   @RequestParam String content, @RequestParam double rating){
 
-        ReviewDTO reviewDTO = ReviewDTO.builder()
-                .content(content)
-                .rating(rating)
-                .schedulenum(schedulenum)
-                .usernum(usernum)
-                .build();
+        int usernum=userService.findUserByEmail(useremail).orElseThrow(()->new NoSuchDataException()).getUser_num();
+        int placenum=scheduleService.findScheduleById(schedulenum).orElseThrow(()->new NoSuchDataException()).getPlace().getPlace_num();
 
-        ImagePath imagePath = this.amazonClient.uploadFile(file);
-        Review review = reviewDTO.toReviewEntity();
-        review.addPhoto(Photo.builder().bucket(s3Url+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
-        review.setThumb(Thumb.builder().bucket(s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
-        reviewService.uploadReview(review);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+            ReviewDTO reviewDTO = ReviewDTO.builder()
+                    .content(content)
+                    .rating(rating)
+                    .schedulenum(schedulenum)
+                    .usernum(usernum)
+                    .placenum(placenum)
+                    .build();
+            Review review = reviewDTO.toReviewEntity();
+            reviewService.uploadReview(review);
+            return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping(value="/loadMainReview")
-    public ResponseEntity<List<ReviewDTO>> loadMainReview() throws IOException {
-        List<Review> reviewList = reviewService.loadMainReview();
-        List<ReviewDTO> reviewDTOList = new ArrayList<>();
+    @ApiOperation(value="upload review only content",notes = "사진을 제외한 콘텐츠 업로드")
+    @PostMapping(value = "/uploadPhoto")
+    public ResponseEntity<ReviewDTO> uploadPhoto(@RequestParam String useremail, @RequestParam int schedulenum,
+                                                   @RequestParam MultipartFile file){
 
-        for (Review r: reviewList) {
-            User user = userService.findUserByUsernum(r.getUsernum()).orElseThrow(()->new NoSuchDataException());
-
-            Collection<Photo> photoList = r.getPhotos();
-            List<String> photos = new ArrayList<>();
-
-            ReviewDTO reviewDTO = r.toReviewDTO();
-            reviewDTO.setUserEmail(user.getEmail());
-            for (Photo p: photoList) {
-                photos.add(p.getBucket());
-            }
-            reviewDTO.setPhotolist(photos);
-            reviewDTOList.add(reviewDTO);
-        }
-        return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
+        int usernum=userService.findUserByEmail(useremail).orElseThrow(()->new NoSuchDataException()).getUser_num();
+        Review review = reviewService.loadReviewByUsernumAndScheduleNum(usernum,schedulenum).orElseThrow(()->new NoSuchDataException("해당 리뷰 정보 없음."));
+        ImagePath imagePath = this.amazonClient.uploadFile(file);
+        if(review.getThumb()==null)
+            review.setThumb(Thumb.builder().bucket(s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
+        review.addPhoto(Photo.builder().bucket(s3Url+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
+        reviewService.uploadReview(review);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value="/loadMainReviewByPaging/{page}")
@@ -113,8 +110,10 @@ public class ReviewController {
         List<MainReviewDTO> reviewDTOList = new ArrayList<>();
 
         for (Review r : reviewList) {
-            Thumb thumb = r.getThumb();
             MainReviewDTO reviewDTO = r.toMainReviewDTO();
+            User user = userService.findUserByUsernum(r.getUsernum()).get();//.orElseThrow(()->new NoSuchDataException("유저 정보가 없습니다."));
+            reviewDTO.setUser(user.getEmail());
+            Thumb thumb = r.getThumb();
             String photoUrl = thumb.getBucket();
             reviewDTO.setPhotoDTO(photoUrl);
             reviewDTOList.add(reviewDTO);

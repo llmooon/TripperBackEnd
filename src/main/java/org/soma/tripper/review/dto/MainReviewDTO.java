@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class MainReviewDTO {
-    private int usernum;
+    private String user;
     private int schedulenum;
     private String content;
     private double rating;
@@ -22,9 +22,11 @@ public class MainReviewDTO {
         this.photoDTO = photoDTO;
     }
 
+    public void setUser(String user) {this.user = user; }
+
     @Builder
-    MainReviewDTO(int usernum, int schedulenum, String content, double rating){
-        this.usernum=usernum;
+    MainReviewDTO(String user, int schedulenum, String content, double rating){
+        this.user=user;
         this.schedulenum=schedulenum;
         this.content=content;
         this.rating=rating;

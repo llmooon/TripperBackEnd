@@ -9,14 +9,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class ReviewServiceImpl implements ReviewService {
     @Autowired
     ReviewRepository reviewRepository;
 
     @Override
-    public List<Review> loadReview(int user_num, int schedule_num) {
-        return reviewRepository.findReviewByUsernumAndSchedulenum(user_num,schedule_num);
+    public List<Review> loadReviewByUser(int user_num) {
+        return reviewRepository.findReviewByUsernum(user_num);
     }
 
     @Override
@@ -32,6 +34,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Page<Review> loadMainReviewByPage(Pageable page) {
         return reviewRepository.findAll(page);
+    }
+
+    @Override
+    public Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum) {
+        return reviewRepository.findReviewByUsernumAndSchedulenum(usernum,schedulenum);
     }
 }
 
