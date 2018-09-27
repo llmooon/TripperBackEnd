@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.review.dto.DetailDTO;
 import org.soma.tripper.review.dto.ImagePath;
+import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.dto.ReviewDTO;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Photo;
@@ -16,13 +17,19 @@ import org.soma.tripper.review.service.AmazonClient;
 import org.soma.tripper.review.service.DetailsService;
 import org.soma.tripper.review.service.ReviewService;
 import org.soma.tripper.schedule.service.ScheduleService;
+import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -76,47 +83,60 @@ public class ReviewController {
 
     @ApiOperation(value="upload review only content",notes = "사진 업로드")
     @PostMapping(value = "/uploadPhoto")
-    public ResponseEntity<ReviewDTO> uploadPhoto(@RequestParam String useremail, @RequestParam int seqnum, @RequestParam int schedulenum,
+    public ResponseEntity<ReviewDTO> uploadPhoto(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam int schedulenum,
                                                    @RequestParam MultipartFile file){
 
-        int usernum=userService.findUserByEmail(useremail).orElseThrow(()->new NoSuchDataException()).getUser_num();
+        int usernum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
         //일단 schedulenum 으로만 update
         Details details = detailsService.loadDetailsBySchedulenum(schedulenum).orElseThrow(()->new NoSuchDataException("해당 리뷰 정보 없음."));
-
         ImagePath imagePath = this.amazonClient.uploadFile(file);
         details.addPhoto(Photo.builder().bucket(s3Url+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
-
         detailsService.save(details);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @GetMapping("/userload/{userEmail}")
-//    public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail){
-//        int userNum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
-//        List<Review> reviews = reviewService.loadReviewByUser(userNum);
-//        return new ResponseEntity<>(reviews,HttpStatus.OK);
-//    }
-//
-//
-//
-//    @GetMapping(value="/loadMainReviewByPaging/{page}")
-//    public ResponseEntity<List<MainReviewDTO>> loadMainReviewByPaging(@PathVariable Integer page) throws IOException {
-//        int size = 10;
-//        PageRequest request = PageRequest.of(page, size, new Sort(Sort.Direction.ASC, "reviewnum"));
-//        Page<Review> result = reviewService.loadMainReviewByPage(request);
-//        List<Review> reviewList = result.getContent();
-//        List<MainReviewDTO> reviewDTOList = new ArrayList<>();
-//
-//        for (Review r : reviewList) {
-//            MainReviewDTO reviewDTO = r.toMainReviewDTO();
-//            User user = userService.findUserByUsernum(r.getUsernum()).get();//.orElseThrow(()->new NoSuchDataException("유저 정보가 없습니다."));
-//            reviewDTO.setUser(user.getEmail());
-//            Thumb thumb = r.getThumb();
-//            String photoUrl = thumb.getBucket();
-//            reviewDTO.setPhotoDTO(photoUrl);
-//            reviewDTOList.add(reviewDTO);
-//        }
-//
-//        return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
-//    }
+    @ApiOperation(value="upload Main Photo",notes = "대표 리뷰 사진 등록/수정")
+    @PostMapping(value = "/uploadMainPhoto")
+    public ResponseEntity<ReviewDTO> upload(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam MultipartFile file){
+        int usernum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
+        Review review = reviewService.loadReviewByUserAndSeq(usernum,seqnum).orElseThrow(()->new NoSuchDataException("없는 seqnum"));
+        if(review.getThumb()!=null){
+            String url=review.getThumb().getBucket();
+            amazonClient.deleteFileFromS3Bucket(url);
+        }
+        ImagePath imagePath = this.amazonClient.uploadFile(file);
+        review.setThumb(Thumb.builder().bucket(s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
+        reviewService.uploadReview(review);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @GetMapping("/userload/{userEmail}")
+    public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail){
+        int userNum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
+        List<Review> reviews = reviewService.loadReviewByUser(userNum).orElseThrow(()->new NoSuchDataException("작성된 리뷰가 없습니다."));
+        return new ResponseEntity<>(reviews,HttpStatus.OK);
+    }
+
+    @GetMapping(value="/loadMainReviewByPaging/{page}")
+    public ResponseEntity<List<MainReviewDTO>> loadMainReviewByPaging(@PathVariable Integer page) throws IOException {
+        int size = 10;
+        PageRequest request = PageRequest.of(page, size, new Sort(Sort.Direction.ASC, "reviewnum"));
+        Page<Review> result = reviewService.loadMainReviewByPage(request);
+        List<Review> reviewList = result.getContent();
+        List<MainReviewDTO> reviewDTOList = new ArrayList<>();
+
+        for (Review r : reviewList) {
+            reviewDTOList.add(MainReviewDTO.builder()
+                    .photo(r.getThumb().getBucket())
+                    .time(r.getCreatedDate())
+                    .writer(userService.findUserByUsernum(r.getUsernum()).get().getEmail())
+                    .build());
+        }
+        return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
+    }
 }
+
+// 1. 한글 파일 s3 upload 안됨.
+// 2. s3내 삭제 안됨.
+// 3. MainReviewDTO에서 title 넣어야함.

@@ -57,14 +57,14 @@ public class AmazonClient {
             String fileName = generateFileName(multipartFile);
             fileName = URLEncoder.encode(fileName,"UTF-8").replaceAll("\\+", "%20");
 
+            logger.info(fileName);
+
             DateTime date = new DateTime();
             String DateName = date.getYear() + "/" + date.getMonthOfYear() + "/" + date.getDayOfMonth();
             bucketName = bucketName.concat("/" + date.getYear() + "/" + date.getMonthOfYear() + "/" + date.getDayOfMonth());
             uploadFileTos3bucket(fileName, file);
 
-            String path = System.getProperty("user.dir");
 //            File thumbnail = new File(path+"\\thumbnail.jpg");
-//
 //            thumbnail.getParentFile().mkdirs();
 //            Thumbnails.of(file).size(190,150).outputFormat("jpg").toFile(thumbnail);
 //            uploadThumbnailFileTos3bucket(fileName,thumbnail);

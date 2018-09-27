@@ -22,12 +22,22 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.save(review);
     }
 
-//
-//    @Override
-//    public List<Review> loadReviewByUser(int user_num) {
-//        return reviewRepository.findReviewByUsernum(user_num);
-//    }
-//
+    @Override
+    public Optional<List<Review>> loadReviewByUser(int user_num) {
+        return reviewRepository.findReviewByUsernum(user_num);
+    }
+
+    @Override
+    public Page<Review> loadMainReviewByPage(Pageable page) {
+        return reviewRepository.findAll(page);
+    }
+
+    @Override
+    public Optional<Review> loadReviewByUserAndSeq(int usernum, int seqnum) {
+        return reviewRepository.findReviewByUsernumAndSeqnum(usernum,seqnum);
+    }
+
+    //
 //    @Override
 //    public Review uploadReview(Review review) {
 //        return reviewRepository.save(review);
@@ -36,11 +46,6 @@ public class ReviewServiceImpl implements ReviewService {
 //    @Override
 //    public List<Review> loadMainReview() {
 //        return reviewRepository.findAll();
-//    }
-//
-//    @Override
-//    public Page<Review> loadMainReviewByPage(Pageable page) {
-//        return reviewRepository.findAll(page);
 //    }
 //
 //    @Override

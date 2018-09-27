@@ -9,6 +9,7 @@
 
     public interface ReviewRepository extends JpaRepository<Review,Integer> {
 
-//        List<Review> findReviewByUsernum(int usernum);
+        Optional<List<Review>> findReviewByUsernum(int usernum);
+        Optional<Review> findReviewByUsernumAndSeqnum(int usernum,int seqnum);
 //        Optional<Review> findReviewByUsernumAndSchedulenum(int usernum, int schedulenum);
     }

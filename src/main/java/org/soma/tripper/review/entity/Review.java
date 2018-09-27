@@ -2,6 +2,7 @@ package org.soma.tripper.review.entity;
 
 import lombok.*;
 import org.soma.tripper.common.BaseTimeEntity;
+import org.soma.tripper.review.dto.MainReviewDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;

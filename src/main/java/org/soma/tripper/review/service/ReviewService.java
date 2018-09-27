@@ -9,12 +9,11 @@ import java.util.Optional;
 
 public interface ReviewService {
     Review uploadReview(Review review);
-
-
-    //    List<Review> loadReviewByUser(int user_num);
+    Optional<List<Review>> loadReviewByUser(int user_num);
+    Page<Review> loadMainReviewByPage(Pageable page);
+    Optional<Review> loadReviewByUserAndSeq(int usernum, int seqnum);
 //    Review uploadReview(Review review);
 //    List<Review> loadMainReview();
-//    Page<Review> loadMainReviewByPage(Pageable page);
 //    Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum);
 }
 
