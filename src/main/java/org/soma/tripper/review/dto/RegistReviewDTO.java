@@ -18,14 +18,14 @@ public class RegistReviewDTO {
             super();
         }
 
-        public ReviewDTO toReviewDTO(){
-            return ReviewDTO.builder()
-                    .usernum(usernum)
-                    .schedulenum(schedulenum)
-                    .content(content)
-                    .rating(rating)
-                    //.photolist(photolist)
-                    .build();
-        }
+//        public ReviewDTO toReviewDTO(){
+//            return ReviewDTO.builder()
+//                    .usernum(usernum)
+//                    .schedulenum(schedulenum)
+//                    .content(content)
+//                    .rating(rating)
+//                    //.photolist(photolist)
+//                    .build();
+//        }
 
 }

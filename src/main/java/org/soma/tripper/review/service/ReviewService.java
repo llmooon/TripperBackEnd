@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewService {
-    List<Review> loadReviewByUser(int user_num);
     Review uploadReview(Review review);
-    List<Review> loadMainReview();
-    Page<Review> loadMainReviewByPage(Pageable page);
-    Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum);
+
+
+    //    List<Review> loadReviewByUser(int user_num);
+//    Review uploadReview(Review review);
+//    List<Review> loadMainReview();
+//    Page<Review> loadMainReviewByPage(Pageable page);
+//    Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum);
 }
 
 

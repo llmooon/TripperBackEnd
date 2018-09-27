@@ -2,8 +2,6 @@ package org.soma.tripper.review.entity;
 
 import lombok.*;
 import org.soma.tripper.common.BaseTimeEntity;
-import org.soma.tripper.review.dto.MainReviewDTO;
-import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,70 +16,31 @@ public class Review extends BaseTimeEntity {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int reviewnum;
 
-    @Column(name = "usernum")
     private int usernum;
-
-    @Column(name = "schedule_num")
-    private int schedulenum;
-
-    @Column(name = "content",length = 1000)
-    private String content;
-
-    @Column(name="rating")
-    private double rating;
-
-    @Column(name="ml_rating")
+    private int seqnum;
     private double mlrating;
-
-    @Column(name="view")
     private int view;
-
-    private int placenum;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="thumbnum")
     private Thumb thumb;
 
-
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JoinColumn(name = "reviewnum")
-    private Collection<Photo> photos;
-
-
-    public void addPhoto(Photo p){
-        if(photos==null){
-            photos=new ArrayList<>();
-        }
-        photos.add(p);
-    }
-
-    @Builder Review(int usernum, int schedulenum, String content, double rating,int placenum){
-        this.usernum=usernum;
-        this.schedulenum = schedulenum;
-        this.content=content;
-        this.rating = rating;
-        this.placenum=placenum;
-    }
-
     public void setThumb(Thumb thumb) {
         this.thumb = thumb;
     }
 
-    public ReviewDTO toReviewDTO(){
-        return ReviewDTO.builder()
-                .content(content)
-                .rating(rating)
-                .schedulenum(schedulenum)
-                .usernum(usernum)
-                .createTime(getCreatedDate())
-                .build();
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinColumn(name = "reviewnum")
+    private Collection<Details> details;
+
+    public void adddetails(Details detail){
+        if(details==null) details=new ArrayList<>();
+        details.add(detail);
     }
-    public MainReviewDTO toMainReviewDTO(){
-        return MainReviewDTO.builder()
-                .content(content)
-                .rating(rating)
-                .schedulenum(schedulenum)
-                .build();
+
+    @Builder Review(int usernum, int seqnum){
+        this.usernum=usernum;
+        this.seqnum=seqnum;
     }
 
 }

@@ -13,33 +13,40 @@ import java.util.Optional;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
+
     @Autowired
     ReviewRepository reviewRepository;
-
-    @Override
-    public List<Review> loadReviewByUser(int user_num) {
-        return reviewRepository.findReviewByUsernum(user_num);
-    }
 
     @Override
     public Review uploadReview(Review review) {
         return reviewRepository.save(review);
     }
 
-    @Override
-    public List<Review> loadMainReview() {
-        return reviewRepository.findAll();
-    }
-
-    @Override
-    public Page<Review> loadMainReviewByPage(Pageable page) {
-        return reviewRepository.findAll(page);
-    }
-
-    @Override
-    public Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum) {
-        return reviewRepository.findReviewByUsernumAndSchedulenum(usernum,schedulenum);
-    }
+//
+//    @Override
+//    public List<Review> loadReviewByUser(int user_num) {
+//        return reviewRepository.findReviewByUsernum(user_num);
+//    }
+//
+//    @Override
+//    public Review uploadReview(Review review) {
+//        return reviewRepository.save(review);
+//    }
+//
+//    @Override
+//    public List<Review> loadMainReview() {
+//        return reviewRepository.findAll();
+//    }
+//
+//    @Override
+//    public Page<Review> loadMainReviewByPage(Pageable page) {
+//        return reviewRepository.findAll(page);
+//    }
+//
+//    @Override
+//    public Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum) {
+//        return reviewRepository.findReviewByUsernumAndSchedulenum(usernum,schedulenum);
+//    }
 }
 
 

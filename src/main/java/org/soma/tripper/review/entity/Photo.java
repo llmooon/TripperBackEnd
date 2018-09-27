@@ -14,11 +14,9 @@ public class Photo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int photonum;
 
-    @Column(name="bucket")
     private String bucket;
 
-    @Column(name="reviewnum")
-    private int reviewnum;
+    private int detailsnum;
 
     @Builder
     Photo(String bucket){
