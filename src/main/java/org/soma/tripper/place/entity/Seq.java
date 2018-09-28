@@ -21,6 +21,11 @@ public class Seq {
     private int seqnum;
     private Date fromdate;
     private Date toDate;
+    private String title;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     @ManyToOne(targetEntity = User.class,fetch = FetchType.EAGER)
     @JoinColumn(name="usernum")

@@ -4,10 +4,8 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
-import org.soma.tripper.review.dto.DetailDTO;
-import org.soma.tripper.review.dto.ImagePath;
-import org.soma.tripper.review.dto.MainReviewDTO;
-import org.soma.tripper.review.dto.ReviewDTO;
+import org.soma.tripper.place.Service.SeqService;
+import org.soma.tripper.review.dto.*;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
@@ -51,6 +49,9 @@ public class ReviewController {
     @Autowired
     DetailsService detailsService;
 
+    @Autowired
+    SeqService seqService;
+
     private AmazonClient amazonClient;
 
     @Autowired
@@ -76,7 +77,6 @@ public class ReviewController {
         for (DetailDTO d: reviewDTO.getReviews()) {
             review.adddetails(d.toEntity());
         }
-
         reviewService.uploadReview(review);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -118,25 +118,58 @@ public class ReviewController {
         return new ResponseEntity<>(reviews,HttpStatus.OK);
     }
 
-    @GetMapping(value="/loadMainReviewByPaging/{page}")
-    public ResponseEntity<List<MainReviewDTO>> loadMainReviewByPaging(@PathVariable Integer page) throws IOException {
+
+    @GetMapping("/load/{reviewnum}")
+    public ResponseEntity<ReviewByDayDTO> LoadReviewByreviewnum(@PathVariable int reviewnum){
+        Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 reviewnum"));
+        String user = userService.findUserByUsernum(review.getUsernum()).orElseThrow(()->new NoSuchDataException("잘못된 usernum")).getEmail();
+        List<DetailDTO> detail = review.toDetailDTO();
+        List<DayDTO> dayDTOS = new ArrayList<>();
+        int days=0;
+        for (DetailDTO d: detail) {
+            int day = scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()->new NoSuchDataException("없는 schedulenum")).getDay();
+            if(day!=days){
+                dayDTOS.add(DayDTO.builder().day(day).build());
+                days++;
+            }
+            dayDTOS.get(day-1).addDetails(d);
+        }
+
+        ReviewByDayDTO res = ReviewByDayDTO.builder()
+                .days(dayDTOS)
+                .seqnum(review.getSeqnum())
+                .user(user)
+                .thumb(review.getThumb().getBucket())
+                .build();
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @ApiOperation(value="페이지당 20개씩. 시간순은 version 값 0, 조회수는 version 값 1로 설정. ",notes = "메인 화면 리뷰 불러오기")
+    @GetMapping(value="/loadMainReviewByPaging/{page}/{version}")
+    public ResponseEntity<List<MainReviewDTO>> loadMainReviewByPaging(@PathVariable Integer page , @PathVariable Integer version) throws IOException {
         int size = 10;
-        PageRequest request = PageRequest.of(page, size, new Sort(Sort.Direction.ASC, "reviewnum"));
+        PageRequest request;
+        if(version==0) request=PageRequest.of(page, size, new Sort(Sort.Direction.DESC, "reviewnum"));
+        else request=PageRequest.of(page, size, new Sort(Sort.Direction.DESC, "view"));
         Page<Review> result = reviewService.loadMainReviewByPage(request);
         List<Review> reviewList = result.getContent();
         List<MainReviewDTO> reviewDTOList = new ArrayList<>();
 
         for (Review r : reviewList) {
             reviewDTOList.add(MainReviewDTO.builder()
+                    .reviewnum(r.getReviewnum())
                     .photo(r.getThumb().getBucket())
                     .time(r.getCreatedDate())
                     .writer(userService.findUserByUsernum(r.getUsernum()).get().getEmail())
+                    .title(seqService.loadSeq(r.getSeqnum()).get().getTitle())
                     .build());
         }
         return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
     }
+
+
 }
 
 // 1. 한글 파일 s3 upload 안됨.
 // 2. s3내 삭제 안됨.
-// 3. MainReviewDTO에서 title 넣어야함.

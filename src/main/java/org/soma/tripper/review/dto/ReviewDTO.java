@@ -12,6 +12,5 @@ public class ReviewDTO {
     private int seqnum;
     private List<DetailDTO> reviews;
 
-    //toEntity cannot make.
 
 }

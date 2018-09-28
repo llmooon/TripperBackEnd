@@ -11,12 +11,12 @@ import java.util.Collection;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Photo {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int photonum;
 
     private String bucket;
 
-    private int detailsnum;
+    //private int detailsnum;
 
     @Builder
     Photo(String bucket){

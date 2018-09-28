@@ -2,11 +2,14 @@ package org.soma.tripper.review.entity;
 
 import lombok.*;
 import org.soma.tripper.common.BaseTimeEntity;
+import org.soma.tripper.review.dto.DetailDTO;
 import org.soma.tripper.review.dto.MainReviewDTO;
 
 import javax.persistence.*;
+import javax.xml.soap.Detail;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @ToString
@@ -37,6 +40,23 @@ public class Review extends BaseTimeEntity {
     public void adddetails(Details detail){
         if(details==null) details=new ArrayList<>();
         details.add(detail);
+    }
+
+    public List<DetailDTO> toDetailDTO(){
+        List<DetailDTO> detailDTOS = new ArrayList<>();
+        for(Details d : details){
+            List<String> photos = new ArrayList<>();
+            for(Photo p:d.getPhotos()){
+                photos.add(p.getBucket());
+            }
+            detailDTOS.add(
+                    DetailDTO.builder()
+                    .content(d.getContent())
+                    .photos(photos)
+                    .schedulenum(d.getSchedulenum())
+                    .build());
+        }
+        return detailDTOS;
     }
 
     @Builder Review(int usernum, int seqnum){

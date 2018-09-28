@@ -40,4 +40,5 @@ public class SearchController {
         List<Place> placeList = placeService.getAllPlace();
         searchService.MakeSearchDB(placeList);
     }
+
 }

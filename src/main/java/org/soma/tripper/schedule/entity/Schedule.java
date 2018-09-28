@@ -16,8 +16,9 @@ import java.sql.Date;
 public class Schedule {
     @JsonIgnore
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     int schedulenum;
+
     int day;
     int seqnum;
     Date startTime;

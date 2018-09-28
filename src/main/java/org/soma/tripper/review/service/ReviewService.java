@@ -12,6 +12,7 @@ public interface ReviewService {
     Optional<List<Review>> loadReviewByUser(int user_num);
     Page<Review> loadMainReviewByPage(Pageable page);
     Optional<Review> loadReviewByUserAndSeq(int usernum, int seqnum);
+    Optional<Review> loadReviewById(int num);
 //    Review uploadReview(Review review);
 //    List<Review> loadMainReview();
 //    Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum);

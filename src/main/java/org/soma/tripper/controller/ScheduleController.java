@@ -14,6 +14,7 @@ import org.soma.tripper.place.dto.PurposeDTO;
 import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
+import org.soma.tripper.schedule.dto.ScheduleDTO;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
@@ -112,6 +113,14 @@ public class ScheduleController {
        return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
+    @PutMapping("/inputScheduleName")
+    public ResponseEntity<SeqDTO> inputScheduleName(@RequestBody ScheduleDTO scheduleDTO){
+        Seq seq = seqService.loadSeq(scheduleDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("없는 seqnum"));
+        seq.setTitle(scheduleDTO.getScheduleName());
+        seqService.modifySeq(seq);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
     @GetMapping("/testML")
     public ResponseEntity<List<Integer>> testsendAllSchedule(){
@@ -122,6 +131,7 @@ public class ScheduleController {
         }
         return new ResponseEntity<>(placeList,HttpStatus.OK);
     }
+
 
     private List<Integer> sendML(MLDTO mldto){
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -155,4 +165,6 @@ public class ScheduleController {
         }
         return scheduleList;
     }
+
+
 }

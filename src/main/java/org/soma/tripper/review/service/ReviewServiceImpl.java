@@ -37,7 +37,11 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.findReviewByUsernumAndSeqnum(usernum,seqnum);
     }
 
-    //
+    @Override
+    public Optional<Review> loadReviewById(int num) {
+        return reviewRepository.findById(num);
+    }
+//
 //    @Override
 //    public Review uploadReview(Review review) {
 //        return reviewRepository.save(review);
