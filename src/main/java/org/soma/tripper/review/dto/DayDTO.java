@@ -11,14 +11,14 @@ import java.util.List;
 @ToString
 public class DayDTO {
     int day;
-    List<DetailDTO> detailDTOS;
+    List<ReadDetailDTO> detailDTOS;
 
-    public void addDetails(DetailDTO d){
+    public void addDetails(ReadDetailDTO d){
         if(detailDTOS==null) detailDTOS=new ArrayList<>();
         detailDTOS.add(d);
     }
 
-    @Builder DayDTO(int day, List<DetailDTO> details){
+    @Builder DayDTO(int day,  List<ReadDetailDTO> details){
         this.day=day;
         this.detailDTOS=details;
     }

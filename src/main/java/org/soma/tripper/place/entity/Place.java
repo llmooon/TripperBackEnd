@@ -17,7 +17,7 @@ public class Place {
     private String country;
     private String city;
     private String name;
-
+    private double rating;
     @Lob
     @Column(columnDefinition = "text")
     private String details;

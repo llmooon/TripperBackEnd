@@ -3,6 +3,7 @@ package org.soma.tripper.place.dto;
 import lombok.*;
 import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.entity.Seq;
+import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.repository.UserRepository;
@@ -18,15 +19,15 @@ public class SeqDTO {
     private Date fromdate;
     private Date toDate;
     private String user;
-    private List<Schedule> schedulelist;
+    private List<Day> dayList;
 
     @Builder
-    public SeqDTO(int seqnum,Date fromdate,Date toDate,String user,List<Schedule> schedulelist){
+    public SeqDTO(int seqnum,Date fromdate,Date toDate,String user, List<Day> dayList){
         this.seqnum=seqnum;
         this.fromdate=fromdate;
         this.toDate=toDate;
         this.user=user;
-        this.schedulelist=schedulelist;
+        this.dayList=dayList;
     }
 
 }

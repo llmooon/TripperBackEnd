@@ -4,7 +4,10 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
+import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.SeqService;
+import org.soma.tripper.place.entity.Place;
+import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.review.dto.*;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Photo;
@@ -14,6 +17,7 @@ import org.soma.tripper.review.repository.PhotoRepository;
 import org.soma.tripper.review.service.AmazonClient;
 import org.soma.tripper.review.service.DetailsService;
 import org.soma.tripper.review.service.ReviewService;
+import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
@@ -48,6 +52,9 @@ public class ReviewController {
 
     @Autowired
     DetailsService detailsService;
+
+    @Autowired
+    PlaceService placeService;
 
     @Autowired
     SeqService seqService;
@@ -122,19 +129,28 @@ public class ReviewController {
     @GetMapping("/load/{reviewnum}")
     public ResponseEntity<ReviewByDayDTO> LoadReviewByreviewnum(@PathVariable int reviewnum){
         Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 reviewnum"));
-        String user = userService.findUserByUsernum(review.getUsernum()).orElseThrow(()->new NoSuchDataException("잘못된 usernum")).getEmail();
+        Seq seq = seqService.loadSeq(review.getSeqnum()).orElseThrow(()->new NoSuchDataException("잘못된 seqnum"));
+
+
         List<DetailDTO> detail = review.toDetailDTO();
         List<DayDTO> dayDTOS = new ArrayList<>();
+        List<ReadDetailDTO> readDetailDTOS = new ArrayList<>();
         int days=0;
         for (DetailDTO d: detail) {
-            int day = scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()->new NoSuchDataException("없는 schedulenum")).getDay();
+            logger.info(d.toString());
+            Schedule schedule =scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()->new NoSuchDataException("없는 schedulenum"));
+            int day = schedule.getDaynum();
+            ReadDetailDTO rd =ReadDetailDTO.builder().content(d.getContent()).photos(d.getPhotos()).schedule(schedule).build();
+
+
             if(day!=days){
                 dayDTOS.add(DayDTO.builder().day(day).build());
                 days++;
             }
-            dayDTOS.get(day-1).addDetails(d);
+            dayDTOS.get(day-1).addDetails(rd);
         }
 
+        String user = userService.findUserByUsernum(review.getUsernum()).orElseThrow(()->new NoSuchDataException("잘못된 usernum")).getEmail();
         ReviewByDayDTO res = ReviewByDayDTO.builder()
                 .days(dayDTOS)
                 .seqnum(review.getSeqnum())

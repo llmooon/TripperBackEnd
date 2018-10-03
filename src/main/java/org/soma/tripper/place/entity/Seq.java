@@ -2,6 +2,7 @@ package org.soma.tripper.place.entity;
 
 import lombok.*;
 import org.soma.tripper.place.dto.SeqDTO;
+import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.user.domain.User;
 
@@ -33,20 +34,20 @@ public class Seq {
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "seqnum")
-    private List<Schedule> schedulelist;
+    private List<Day> dayList;
 
 
     @Builder
-    public Seq(int seqnum,User user,List<Schedule> schedulelist,Date fromdate, Date toDate){
+    public Seq(int seqnum,User user,List<Day> dayList,Date fromdate, Date toDate){
         this.seqnum=seqnum;
         this.user = user;
-        this.schedulelist=schedulelist;
+        this.dayList=dayList;
         this.fromdate=fromdate;
         this.toDate=toDate;
     }
 
-    public void setSchedulelist(List<Schedule> schedulelist) {
-        this.schedulelist = schedulelist;
+    public void setSchedulelist(List<Day> dayList) {
+        this.dayList = dayList;
     }
 
     public SeqDTO toDTO(){
@@ -55,7 +56,7 @@ public class Seq {
                 .fromdate(this.getFromdate())
                 .toDate(this.getToDate())
                 .user(this.user.getEmail())
-                .schedulelist(this.getSchedulelist())
+                .dayList(this.getDayList())
                 .build();
     }
 }

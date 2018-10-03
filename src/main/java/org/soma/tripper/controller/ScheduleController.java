@@ -15,6 +15,7 @@ import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.schedule.dto.ScheduleDTO;
+import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
@@ -59,9 +60,9 @@ public class ScheduleController {
                 .user(user)
                 .build();
 
-        List<Schedule> scheduleList = makeSchedule(sendML(mldto));
+        List<Day> dayList = makeDaySchedule(sendML(mldto));
         Seq seq = Seq.builder()
-                .schedulelist(scheduleList)
+                .dayList(dayList)
                 .user(user)
                 .build();
 
@@ -86,7 +87,7 @@ public class ScheduleController {
         User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
 
         Seq seq = Seq.builder()
-                .schedulelist(seqDTO.getSchedulelist())
+                .dayList(seqDTO.getDayList())
                 .user(user)
                 .build();
 
@@ -104,7 +105,7 @@ public class ScheduleController {
         Seq seq = seqService.insertSeq(
                 Seq.builder()
                 .user(user)
-                .schedulelist(seqDTO.getSchedulelist())
+                .dayList(seqDTO.getDayList())
                 .fromdate(seqDTO.getFromdate())
                 .toDate(seqDTO.getToDate())
                 .build()
@@ -126,8 +127,11 @@ public class ScheduleController {
     public ResponseEntity<List<Integer>> testsendAllSchedule(){
         List<Place> places=placeService.getAllPlace();
         ArrayList<Integer> placeList = new ArrayList<>();
+        int cnt=0;
         for(Place p : places){
             placeList.add(p.getPlace_num());
+            cnt++;
+            if(cnt>10) break;
         }
         return new ResponseEntity<>(placeList,HttpStatus.OK);
     }
@@ -148,22 +152,40 @@ public class ScheduleController {
         return (List<Integer>) (((ResponseEntity) obj).getBody());
     }
 
-    private List<Schedule> makeSchedule(List<Integer> placeNum){
-        List<Schedule> scheduleList = new ArrayList<>();
+    private List<Day> makeDaySchedule(List<Integer> placeNum){
+        List<List<Schedule>> scheduleList = new ArrayList<>();
+        List<Day> dayList= new ArrayList<>();
         int nowday=1,nowcnt=0;
+        scheduleList.add(new ArrayList<>());
 
         for(int i : placeNum){
-            //Date d = new Date;
+            if(nowcnt>=3){
+                nowcnt=0;
+                Day day = Day.builder()
+                        .day(nowday)
+                        .schedulelist(scheduleList.get(nowday-1))
+                        .build();
+                dayList.add(day);
+                nowday++;
+                scheduleList.add(new ArrayList<>());
+            }
             Schedule schedule = Schedule.builder()
-                    .day(nowday)
                     .place(placeService.findPlaceByNum(i).get())
                     .build();
-            scheduleList.add(schedule);
-
+            scheduleList.get(nowday-1).add(schedule);
             nowcnt++;
-            if(nowcnt>=3){nowcnt=0;nowday++;}
         }
-        return scheduleList;
+        if(nowcnt%3==0){
+            scheduleList.remove(nowday);
+        }
+        else{
+            Day day = Day.builder()
+                    .day(nowday)
+                    .schedulelist(scheduleList.get(nowday-1))
+                    .build();
+            dayList.add(day);
+        }
+        return dayList;
     }
 
 

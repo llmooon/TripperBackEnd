@@ -1,14 +1,13 @@
 package org.soma.tripper.review.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import org.soma.tripper.review.entity.Details;
 
 import java.util.List;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DetailDTO {
     private int schedulenum;
     private String content;
