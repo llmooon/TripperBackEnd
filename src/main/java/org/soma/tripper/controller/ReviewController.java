@@ -74,7 +74,6 @@ public class ReviewController {
     public ResponseEntity<ReviewDTO> uploadReview(@RequestBody ReviewDTO reviewDTO){
 
         int usernum=userService.findUserByEmail(reviewDTO.getUser()).orElseThrow(()->new NoSuchDataException()).getUser_num();
-        // confirm schedulenum
 
         Review review= Review.builder()
                             .seqnum(reviewDTO.getSeqnum())
@@ -82,7 +81,7 @@ public class ReviewController {
                             .build();
 
         for (DetailDTO d: reviewDTO.getReviews()) {
-            review.adddetails(d.toEntity());
+            review.adddetails(d.toEntity(scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()->new NoSuchDataException("error schedulenum!"))));
         }
         reviewService.uploadReview(review);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -95,7 +94,8 @@ public class ReviewController {
 
         int usernum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
         //일단 schedulenum 으로만 update
-        Details details = detailsService.loadDetailsBySchedulenum(schedulenum).orElseThrow(()->new NoSuchDataException("해당 리뷰 정보 없음."));
+        Schedule schedule = scheduleService.findScheduleById(schedulenum).orElseThrow(()->new NoSuchDataException("잘못된 schedule"));
+        Details details = detailsService.loadDetailsBySchedule(schedule).orElseThrow(()->new NoSuchDataException("해당 리뷰 정보 없음."));
         ImagePath imagePath = this.amazonClient.uploadFile(file);
         details.addPhoto(Photo.builder().bucket(s3Url+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
         detailsService.save(details);
@@ -138,10 +138,9 @@ public class ReviewController {
         int days=0;
         for (DetailDTO d: detail) {
             logger.info(d.toString());
-            Schedule schedule =scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()->new NoSuchDataException("없는 schedulenum"));
+            Schedule schedule =scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()-> new NoSuchDataException("error schedule num"));
             int day = schedule.getDaynum();
             ReadDetailDTO rd =ReadDetailDTO.builder().content(d.getContent()).photos(d.getPhotos()).schedule(schedule).build();
-
 
             if(day!=days){
                 dayDTOS.add(DayDTO.builder().day(day).build());
@@ -151,12 +150,22 @@ public class ReviewController {
         }
 
         String user = userService.findUserByUsernum(review.getUsernum()).orElseThrow(()->new NoSuchDataException("잘못된 usernum")).getEmail();
-        ReviewByDayDTO res = ReviewByDayDTO.builder()
-                .days(dayDTOS)
-                .seqnum(review.getSeqnum())
-                .user(user)
-                .thumb(review.getThumb().getBucket())
-                .build();
+        ReviewByDayDTO res;
+        if(review.getThumb()!=null) {
+            res = ReviewByDayDTO.builder()
+                    .days(dayDTOS)
+                    .seqnum(review.getSeqnum())
+                    .user(user)
+                    .thumb(review.getThumb().getBucket())
+                    .build();
+        }
+        else{
+            res = ReviewByDayDTO.builder()
+                    .days(dayDTOS)
+                    .seqnum(review.getSeqnum())
+                    .user(user)
+                    .build();
+        }
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
@@ -164,7 +173,7 @@ public class ReviewController {
     @ApiOperation(value="페이지당 20개씩. 시간순은 version 값 0, 조회수는 version 값 1로 설정. ",notes = "메인 화면 리뷰 불러오기")
     @GetMapping(value="/loadMainReviewByPaging/{page}/{version}")
     public ResponseEntity<List<MainReviewDTO>> loadMainReviewByPaging(@PathVariable Integer page , @PathVariable Integer version) throws IOException {
-        int size = 10;
+        int size = 20;
         PageRequest request;
         if(version==0) request=PageRequest.of(page, size, new Sort(Sort.Direction.DESC, "reviewnum"));
         else request=PageRequest.of(page, size, new Sort(Sort.Direction.DESC, "view"));

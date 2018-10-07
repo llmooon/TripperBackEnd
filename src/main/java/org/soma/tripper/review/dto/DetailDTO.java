@@ -2,7 +2,12 @@ package org.soma.tripper.review.dto;
 
 import lombok.*;
 import org.soma.tripper.review.entity.Details;
+import org.soma.tripper.review.entity.Thumb;
+import org.soma.tripper.schedule.entity.Schedule;
 
+import javax.persistence.CascadeType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import java.util.List;
 
 @Getter
@@ -19,10 +24,10 @@ public class DetailDTO {
         this.photos=photos;
     }
 
-    public Details toEntity(){
+    public Details toEntity(Schedule schedule){
         return Details.builder()
                 .content(content)
-                .schedulenum(schedulenum)
+                .schedule(schedule)
                 .build();
     }
 }

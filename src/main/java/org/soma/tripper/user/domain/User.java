@@ -29,6 +29,7 @@ public class User implements Serializable {
     private String name;
     private int sex;
     private String device_token;
+    private String url;
 
     @Builder User(int user_num, String name, String email, String password, int sex,String device_token){
         this.sex=sex;

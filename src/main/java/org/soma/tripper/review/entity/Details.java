@@ -1,6 +1,7 @@
 package org.soma.tripper.review.entity;
 
 import lombok.*;
+import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.schedule.entity.Schedule;
 
 import javax.persistence.*;
@@ -17,8 +18,6 @@ public class Details {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int detailsnum;
-
-    private int schedulenum;
     private String content;
     private int reviewnum;
 
@@ -31,9 +30,18 @@ public class Details {
         photos.add(p);
     }
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="schedulenum")
+    private Schedule schedule;
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule=schedule;
+    }
+
     @Builder
-    public Details(int schedulenum, String content ){
-        this.schedulenum=schedulenum;
+    public Details(Schedule schedule, String content ){
+        this.schedule=schedule;
         this.content=content;
     }
+
 }

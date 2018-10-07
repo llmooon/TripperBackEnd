@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SearchService {
-    Optional<Search> SearchRegion(String name);
+    Optional<List<Search>> SearchRegion(String name);
     void MakeSearchDB(List<Place> placeList);
 }

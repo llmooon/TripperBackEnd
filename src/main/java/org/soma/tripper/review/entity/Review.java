@@ -2,6 +2,7 @@ package org.soma.tripper.review.entity;
 
 import lombok.*;
 import org.soma.tripper.common.BaseTimeEntity;
+import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.review.dto.DetailDTO;
 import org.soma.tripper.review.dto.MainReviewDTO;
 
@@ -29,6 +30,7 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name="thumbnum")
     private Thumb thumb;
 
+
     public void setThumb(Thumb thumb) {
         this.thumb = thumb;
     }
@@ -53,7 +55,7 @@ public class Review extends BaseTimeEntity {
                     DetailDTO.builder()
                     .content(d.getContent())
                     .photos(photos)
-                    .schedulenum(d.getSchedulenum())
+                    .schedulenum(d.getSchedule().getSchedulenum())
                     .build());
         }
         return detailDTOS;

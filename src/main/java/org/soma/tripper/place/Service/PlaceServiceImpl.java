@@ -3,8 +3,10 @@ package org.soma.tripper.place.Service;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.repository.PlaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,5 +23,15 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public Optional<Place> findPlaceByNum(int num) {
         return placeRepository.findById(num);
+    }
+
+    @Override
+    public Page<Place> findPlaceByName(Pageable pageable, String name) {
+        return placeRepository.findByNameContains(pageable,name);
+    }
+
+    @Override
+    public void updatePlace(Place place) {
+        placeRepository.save(place);
     }
 }

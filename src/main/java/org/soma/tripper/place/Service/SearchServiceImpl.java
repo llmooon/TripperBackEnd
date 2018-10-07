@@ -22,8 +22,8 @@ public class SearchServiceImpl implements SearchService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public Optional<Search> SearchRegion(String name){
-        return Optional.ofNullable(searchRepository.findByName(name));
+    public Optional<List<Search>> SearchRegion(String name){
+        return (searchRepository.findByNameContains(name));
     }
 
     @Override
