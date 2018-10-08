@@ -59,6 +59,11 @@ dependencies {
     compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.371'
     compile group: 'net.coobird', name: 'thumbnailator', version: '0.4.8'
 
+    //json
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-json', version: '2.0.5.RELEASE'
+    compile group: 'org.apache.clerezza.ext', name: 'org.json.simple', version: '0.4'
+
 
     compile('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
