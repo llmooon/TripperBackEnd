@@ -49,5 +49,4 @@ public class Place {
         photos.add(p);
     }
 
-
 }

@@ -8,13 +8,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.airport.Entity.Airport;
 import org.soma.tripper.airport.service.AirPortService;
+import org.soma.tripper.common.exception.NoSuchDataException;
+import org.soma.tripper.review.entity.Details;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/airport")
@@ -52,4 +60,14 @@ public class AirPortController {
         }
     }
 
+    @GetMapping("/findCode/{city}")
+    @ApiOperation(value="send code",notes="get code")
+    public ResponseEntity<List<Airport>> sendcode(@PathVariable  String city){
+
+        PageRequest request;
+        request=PageRequest.of(0, 1000);
+        Page<Airport> res=airPortService.findCode(request,city);
+        logger.info(res.getContent().toString());
+        return new ResponseEntity<>(res.getContent(),HttpStatus.OK);
+    }
 }

@@ -12,13 +12,13 @@ import javax.persistence.Id;
 public class Airport {
     @Id
     private String code;
-    private String ENcity;
-    private String KRcity;
+    private String encity;
+    private String krcity;
 
     @Builder
     public Airport(String English, String korea, String code){
-        this.ENcity=English;
-        this.KRcity=korea;
+        this.encity =English;
+        this.krcity =korea;
         this.code=code;
     }
 }
