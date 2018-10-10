@@ -34,4 +34,9 @@ public class PlaceServiceImpl implements PlaceService {
     public void updatePlace(Place place) {
         placeRepository.save(place);
     }
+
+    @Override
+    public List<Place> getPlaceByVersion(int version) {
+        return placeRepository.getPlaceByType(version);
+    }
 }

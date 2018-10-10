@@ -1,6 +1,5 @@
 package org.soma.tripper.controller;
 
-import com.amazonaws.services.xray.model.Http;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,15 +8,12 @@ import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.PlaceThumbService;
 import org.soma.tripper.place.dto.DetailPlaceDTO;
 import org.soma.tripper.place.dto.PlaceReviewDTO;
-import org.soma.tripper.place.dto.SimplePlaceDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.PlaceThumb;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Review;
-import org.soma.tripper.review.entity.Thumb;
 import org.soma.tripper.review.service.DetailsService;
 import org.soma.tripper.review.service.ReviewService;
-import org.soma.tripper.review.service.ThumbService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

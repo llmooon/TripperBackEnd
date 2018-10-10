@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface PlaceRepository extends JpaRepository<Place,Integer> {
     List<Place> findAll();
     Page<Place> findByNameContains(Pageable page, String name);
+    List<Place> getPlaceByType(int version);
 }

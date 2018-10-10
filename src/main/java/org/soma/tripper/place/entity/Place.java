@@ -29,7 +29,7 @@ public class Place {
     private double latitude;
     private double longtitude;
     private int price;
-    private String type;
+    private int type;
 
 
     @OneToOne(cascade = CascadeType.ALL)

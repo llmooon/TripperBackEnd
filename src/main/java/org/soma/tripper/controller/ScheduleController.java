@@ -2,6 +2,7 @@ package org.soma.tripper.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -136,6 +137,13 @@ public class ScheduleController {
         return new ResponseEntity<>(placeList,HttpStatus.OK);
     }
 
+    @GetMapping("/SearchingByCategory/{version}/{beforePlaceNum}")
+    @ApiOperation(value="version 값에 따른 카테고리별 장소 반환/ 관광지 :1 //맛집 :2 // 스포츠 :3 // 쇼핑 :4 // 숙박:5 // 공원 :6 // 야경 :7  ")
+    public ResponseEntity<List<Place>> searchingByCategory(@PathVariable Integer version, @PathVariable Integer beforePlaceNum){
+        Place place = placeService.findPlaceByNum(beforePlaceNum).orElseThrow(()-> new NoSuchDataException("잘못된 placenum"));
+        List<Place> placeList = placeService.getPlaceByVersion(version);
+        return new ResponseEntity<>(placeList,HttpStatus.OK);
+    }
 
     private List<Integer> sendML(MLDTO mldto){
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();

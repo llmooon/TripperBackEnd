@@ -43,4 +43,5 @@ INSERT INTO `book_ex`.`photo` (`bucket`, `detailsnum`) VALUES ('https://s3.ap-no
 INSERT INTO `book_ex`.`photo` (`bucket`, `detailsnum`) VALUES ('https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/default2.png', '4');
 
 
-INSERT INTO `book_ex`.`place_thumb` (`bucket`) VALUES ('https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/default2.png');
+INSERT INTO `book_ex`.`place_thumb` (`thumbnum`,`bucket`) VALUES ('0','https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/default2.png');
+

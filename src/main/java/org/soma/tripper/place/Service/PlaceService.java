@@ -11,5 +11,6 @@ public interface PlaceService {
     List<Place> getAllPlace();
     Optional<Place>findPlaceByNum(int num);
     Page<Place> findPlaceByName(Pageable pageable, String name);
+    List<Place> getPlaceByVersion(int version);
     void updatePlace(Place place);
 }
