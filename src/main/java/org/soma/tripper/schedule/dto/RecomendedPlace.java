@@ -6,12 +6,14 @@ import lombok.*;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecomendedPlace {
+    int placenum;
     String name;
     String picture;
     String city;
 
     @Builder
-    public RecomendedPlace(String name,String picture,String city){
+    public RecomendedPlace(int placenum,String name,String picture,String city){
+        this.placenum=placenum;
         this.name=name;
         this.picture=picture;
         this.city=city;

@@ -155,7 +155,7 @@ public class ScheduleController {
         Page<Place> placeList = placeService.getPlaceByVersion(request,version);
         List<RecomendedPlace> recomendedPlaces = new ArrayList<>();
         for(Place p : placeList){
-            RecomendedPlace recomendedPlace = RecomendedPlace.builder().city(p.getCity()).name(p.getName()).picture(p.getThumb().getBucket()).build();
+            RecomendedPlace recomendedPlace = RecomendedPlace.builder().placenum(p.getPlace_num()).city(p.getCity()).name(p.getName()).picture(p.getThumb().getBucket()).build();
             recomendedPlaces.add(recomendedPlace);
         }
         return new ResponseEntity<>(recomendedPlaces,HttpStatus.OK);
