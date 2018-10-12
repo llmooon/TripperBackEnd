@@ -26,6 +26,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +70,7 @@ public class PlaceController {
             Review review = reviewService.loadReviewById(d.getReviewnum()).orElseThrow(()-> new NoSuchDataException("error reviewnum"));
             User user = userService.findUserByUsernum(review.getUsernum()).orElseThrow(()-> new NoSuchDataException("error usernum"));
             placeReviewDTOS.add(PlaceReviewDTO.builder()
+                                            .reviewnum(d.getReviewnum())
                                             .name(user.getName())
                                             .url(user.getUrl())
                                             .content(d.getContent())
@@ -90,5 +95,19 @@ public class PlaceController {
         }
     }
 
+    @GetMapping(value="/makeImg")
+    public void makeImg() throws Exception{
+        String cliendID="";
+        String cliendSecret="";
+        URL url = new URL("https://openapi.naver.com/v1/search/image.xml?");
+        URLConnection urlconn = url.openConnection();
+        urlconn.setRequestProperty("X-Naver-Client-Id",cliendID);
+        urlconn.setRequestProperty("X-Naver-Client-Secret",cliendSecret);
+        BufferedReader br = new BufferedReader(new InputStreamReader(urlconn.getInputStream()));
+        //String jsonText = readAll(rd);
+
+
+
+    }
 
 }
