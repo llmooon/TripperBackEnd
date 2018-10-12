@@ -1,6 +1,9 @@
 package org.soma.tripper.controller;
 
 import io.swagger.annotations.ApiOperation;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
@@ -9,6 +12,7 @@ import org.soma.tripper.place.Service.PlaceThumbService;
 import org.soma.tripper.place.dto.DetailPlaceDTO;
 import org.soma.tripper.place.dto.PlaceReviewDTO;
 import org.soma.tripper.place.entity.Place;
+import org.soma.tripper.place.entity.PlacePhoto;
 import org.soma.tripper.place.entity.PlaceThumb;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Review;
@@ -19,17 +23,16 @@ import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,18 +99,34 @@ public class PlaceController {
     }
 
     @GetMapping(value="/makeImg")
-    public void makeImg() throws Exception{
-        String cliendID="";
-        String cliendSecret="";
-        URL url = new URL("https://openapi.naver.com/v1/search/image.xml?");
-        URLConnection urlconn = url.openConnection();
-        urlconn.setRequestProperty("X-Naver-Client-Id",cliendID);
-        urlconn.setRequestProperty("X-Naver-Client-Secret",cliendSecret);
-        BufferedReader br = new BufferedReader(new InputStreamReader(urlconn.getInputStream()));
-        //String jsonText = readAll(rd);
+    public void makeImg() throws Exception {
+        String clientId = "4WWZY0LHZ1bDkTYp6oqk";
+        String clientSecret = "BAC0kFG8Cz";
+        String url = "https://openapi.naver.com/v1/search/image?query=";
+        String next=" &display=3&start=1&sort=sim";
 
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Naver-Client-Id", clientId);
+        httpHeaders.add("X-Naver-Client-Secret", clientSecret);
 
+        JSONParser jsonParser = new JSONParser();
+        List<Place> places = placeService.getAllPlace();
+        for (Place p: places) {
+            String placeName = URLEncoder.encode(p.getName(),"utf-8");
+            ResponseEntity<String> responseEntity = restTemplate.exchange(url+placeName+next, HttpMethod.GET,new HttpEntity(httpHeaders),String.class);
+            String result = responseEntity.getBody();
+            JSONObject jsonObject = (JSONObject)jsonParser.parse(result);
+            JSONArray jsonArray = (JSONArray) jsonObject.get("items");
+            for(int i=0;i<jsonArray.size();i++){
+                JSONObject obj = (JSONObject) jsonArray.get(i);
+                String link = (String)obj.get("link");
+                if(i==0) p.setThumb(PlaceThumb.builder().bucket(link).build());
+
+                p.addPhoto(PlacePhoto.builder().bucket(link).build());
+            }
+            placeService.updatePlace(p);
+        }
 
     }
-
 }

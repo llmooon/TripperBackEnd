@@ -16,8 +16,6 @@ public class Photo {
 
     private String bucket;
 
-    //private int detailsnum;
-
     @Builder
     Photo(String bucket){
         this.bucket=bucket;

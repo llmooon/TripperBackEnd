@@ -13,7 +13,8 @@ public class PlacePhoto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int photonum;
 
-    @Column(name="bucket")
+    @Lob
+    @Column(columnDefinition = "text")
     private String bucket;
     @Builder
     PlacePhoto(String bucket){

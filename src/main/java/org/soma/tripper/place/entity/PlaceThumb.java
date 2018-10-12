@@ -15,7 +15,8 @@ public class PlaceThumb {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int thumbnum;
 
-    @Column(name="bucket")
+    @Lob
+    @Column(columnDefinition = "text")
     private String bucket;
     @Builder
     PlaceThumb(String bucket){
