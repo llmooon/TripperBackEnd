@@ -36,7 +36,7 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public List<Place> getPlaceByVersion(int version) {
-        return placeRepository.getPlaceByType(version);
+    public Page<Place> getPlaceByVersion(Pageable pageable,int version) {
+        return placeRepository.getPlaceByType(pageable,version);
     }
 }

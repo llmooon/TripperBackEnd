@@ -50,7 +50,7 @@ public class PlaceController {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @GetMapping(value = "/detail/{num}/{page}")
-    @ApiOperation(value = "view place detail")
+    @ApiOperation(value = "view place detail",notes = "page는 리뷰 정보")
     public ResponseEntity<DetailPlaceDTO> viewPlace(@PathVariable Integer num,@PathVariable Integer page){
 
 

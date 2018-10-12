@@ -2,9 +2,9 @@ package org.soma.tripper.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
@@ -15,6 +15,7 @@ import org.soma.tripper.place.dto.PurposeDTO;
 import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
+import org.soma.tripper.schedule.dto.RecomendedPlace;
 import org.soma.tripper.schedule.dto.ScheduleDTO;
 import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
@@ -22,14 +23,21 @@ import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/schedule")
@@ -38,7 +46,8 @@ import java.util.List;
 public class ScheduleController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String PYTHON_SERVER_URL="http://localhost:8080/schedule/testML";
+    private static final String PYTHON_SERVER_TEST_URL="http://localhost:8080/schedule/testML";
+    private static final String PYTHON_SERVER_URL="http://djangoenv-env.f8jvbshimw.ap-northeast-2.elasticbeanstalk.com/recommend/1/?";
     @Autowired
     UserService userService;
 
@@ -53,7 +62,7 @@ public class ScheduleController {
 
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
     @PostMapping("/inputPurpose")
-    public ResponseEntity<SeqDTO> inputPurpose(@RequestBody PurposeDTO purposeDTO){
+    public ResponseEntity<SeqDTO> inputPurpose(@RequestBody PurposeDTO purposeDTO) throws Exception{
         User user = userService.findUserByEmail(purposeDTO.getUser()).orElseThrow(()->new NoSuchDataException("회원 정보가 없습니다."));
 
         MLDTO mldto = MLDTO.builder()
@@ -61,7 +70,7 @@ public class ScheduleController {
                 .user(user)
                 .build();
 
-        List<Day> dayList = makeDaySchedule(sendML(mldto));
+        List<Day> dayList = sendML(mldto);
         Seq seq = Seq.builder()
                 .dayList(dayList)
                 .user(user)
@@ -137,64 +146,70 @@ public class ScheduleController {
         return new ResponseEntity<>(placeList,HttpStatus.OK);
     }
 
-    @GetMapping("/SearchingByCategory/{version}/{beforePlaceNum}")
+    @GetMapping("/SearchingByCategory/{version}/{beforePlaceNum}/{page}")
     @ApiOperation(value="version 값에 따른 카테고리별 장소 반환/ 관광지 :1 //맛집 :2 // 스포츠 :3 // 쇼핑 :4 // 숙박:5 // 공원 :6 // 야경 :7  ")
-    public ResponseEntity<List<Place>> searchingByCategory(@PathVariable Integer version, @PathVariable Integer beforePlaceNum){
+    public ResponseEntity<List<RecomendedPlace>> searchingByCategory(@PathVariable Integer version, @PathVariable Integer beforePlaceNum, @PathVariable Integer page){
         Place place = placeService.findPlaceByNum(beforePlaceNum).orElseThrow(()-> new NoSuchDataException("잘못된 placenum"));
-        List<Place> placeList = placeService.getPlaceByVersion(version);
-        return new ResponseEntity<>(placeList,HttpStatus.OK);
+        PageRequest request;
+        request= PageRequest.of(page,20);
+        Page<Place> placeList = placeService.getPlaceByVersion(request,version);
+        List<RecomendedPlace> recomendedPlaces = new ArrayList<>();
+        for(Place p : placeList){
+            RecomendedPlace recomendedPlace = RecomendedPlace.builder().city(p.getCity()).name(p.getName()).picture(p.getThumb().getBucket()).build();
+            recomendedPlaces.add(recomendedPlace);
+        }
+        return new ResponseEntity<>(recomendedPlaces,HttpStatus.OK);
     }
 
-    private List<Integer> sendML(MLDTO mldto){
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(5000);
-        factory.setConnectionRequestTimeout(5000);
-        HttpClient httpClient = HttpClientBuilder.create()
-                .setMaxConnTotal(100)
-                .setMaxConnPerRoute(5)
-                .build();
-        factory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(factory);
+    private List<Day> sendML(MLDTO mldto) throws Exception{
+        String url = PYTHON_SERVER_URL+"shopping="+mldto.getShopping()
+                +"&food="+mldto.getFood()+"&tourist="+mldto.getTourist()+"&culture="+mldto.getCulture()+"&entertainment="+mldto.getEntertainment();
+        URI uri = URI.create(url);
+        RestTemplate restTemplate=new RestTemplate();
+        String responseString = restTemplate.getForObject(uri,String.class);
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject)jsonParser.parse(responseString);
+        JSONArray json = (JSONArray) jsonObject.get("result");
 
-        Object obj = restTemplate.getForEntity(PYTHON_SERVER_URL,List.class,mldto);
-        return (List<Integer>) (((ResponseEntity) obj).getBody());
-    }
-
-    private List<Day> makeDaySchedule(List<Integer> placeNum){
+        List<Day> dayList=new ArrayList<>();
         List<List<Schedule>> scheduleList = new ArrayList<>();
-        List<Day> dayList= new ArrayList<>();
-        int nowday=1,nowcnt=0;
         scheduleList.add(new ArrayList<>());
 
-        for(int i : placeNum){
-            if(nowcnt>=3){
-                nowcnt=0;
-                Day day = Day.builder()
-                        .day(nowday)
-                        .schedulelist(scheduleList.get(nowday-1))
+        ZonedDateTime d = ZonedDateTime.parse((String)((JSONObject)json.get(0)).get("recommend_time"));
+        LocalTime beforeday = d.toLocalTime();
+        int cnt=0;
+        for(int i=0;i<json.size();i++){
+            JSONObject tmp = (JSONObject) json.get(i);
+
+            ZonedDateTime tmptime=ZonedDateTime.parse((String)tmp.get("recommend_time"));
+            LocalTime date1=tmptime.toLocalTime();
+            int place_num= ((Long)tmp.get("trip_id")).intValue();
+            Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong place_nium"));
+
+            if(date1.isAfter(beforeday)) {
+                cnt++;
+                Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
+                        .day(cnt)
                         .build();
                 dayList.add(day);
-                nowday++;
                 scheduleList.add(new ArrayList<>());
             }
+            beforeday=date1;
+
             Schedule schedule = Schedule.builder()
-                    .place(placeService.findPlaceByNum(i).get())
+                    .daynum(cnt)
+                    .startTime(date1)
+                    .place(place)
+
                     .build();
-            scheduleList.get(nowday-1).add(schedule);
-            nowcnt++;
+            scheduleList.get(cnt).add(schedule);
         }
-        if(nowcnt%3==0){
-            scheduleList.remove(nowday);
-        }
-        else{
-            Day day = Day.builder()
-                    .day(nowday)
-                    .schedulelist(scheduleList.get(nowday-1))
-                    .build();
-            dayList.add(day);
-        }
+        cnt++;
+        Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
+                .day(cnt)
+                .build();
+        dayList.add(day);
+        scheduleList.add(new ArrayList<>());
         return dayList;
     }
-
-
 }
