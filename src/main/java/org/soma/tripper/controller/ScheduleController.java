@@ -32,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -176,17 +177,17 @@ public class ScheduleController {
         scheduleList.add(new ArrayList<>());
 
         ZonedDateTime d = ZonedDateTime.parse((String)((JSONObject)json.get(0)).get("recommend_time"));
-        LocalTime beforeday = d.toLocalTime();
+        LocalDateTime beforeday = d.toLocalDateTime();
         int cnt=0;
         for(int i=0;i<json.size();i++){
             JSONObject tmp = (JSONObject) json.get(i);
 
             ZonedDateTime tmptime=ZonedDateTime.parse((String)tmp.get("recommend_time"));
-            LocalTime date1=tmptime.toLocalTime();
+            LocalDateTime date1=tmptime.toLocalDateTime();
             int place_num= ((Long)tmp.get("trip_id")).intValue();
             Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong place_nium"));
 
-            if(date1.isAfter(beforeday)) {
+            if(date1.getDayOfMonth()!=beforeday.getDayOfMonth()) {
                 cnt++;
                 Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
                         .day(cnt)

@@ -7,6 +7,7 @@ import org.soma.tripper.place.entity.Place;
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -22,14 +23,14 @@ public class Schedule {
     @JsonIgnore
     int daynum;
 
-    LocalTime startTime;
+    LocalDateTime startTime;
 
     @OneToOne//(cascade = CascadeType.MERGE)
     @JoinColumn(name = "placenum")
     private Place place;
 
     @Builder
-    public Schedule(int daynum,Place place,LocalTime startTime){
+    public Schedule(int daynum,Place place,LocalDateTime startTime){
         this.daynum=daynum;
         this.place=place;
         this.startTime=startTime;
