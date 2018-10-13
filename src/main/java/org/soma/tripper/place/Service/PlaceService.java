@@ -1,6 +1,7 @@
 package org.soma.tripper.place.Service;
 
 import org.soma.tripper.place.entity.Place;
+import org.soma.tripper.place.entity.PlaceThumb;
 import org.springframework.data.domain.Page;
 
 import org.springframework.data.domain.Pageable;
@@ -13,4 +14,6 @@ public interface PlaceService {
     Page<Place> findPlaceByName(Pageable pageable, String name);
     Page<Place> getPlaceByVersion(Pageable page,int version);
     void updatePlace(Place place);
+    void updatePlaceList(List<Place> places);
+    List<Place> findPlaceByThumb(PlaceThumb placeThumb);
 }

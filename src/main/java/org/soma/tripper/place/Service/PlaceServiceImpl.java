@@ -1,6 +1,7 @@
 package org.soma.tripper.place.Service;
 
 import org.soma.tripper.place.entity.Place;
+import org.soma.tripper.place.entity.PlaceThumb;
 import org.soma.tripper.place.repository.PlaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,7 +37,17 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    public void updatePlaceList(List<Place> places){
+        placeRepository.saveAll(places);
+    }
+
+    @Override
     public Page<Place> getPlaceByVersion(Pageable pageable,int version) {
         return placeRepository.getPlaceByType(pageable,version);
+    }
+
+    @Override
+    public List<Place> findPlaceByThumb(PlaceThumb placeThumb) {
+        return placeRepository.getPlaceByThumb(placeThumb);
     }
 }

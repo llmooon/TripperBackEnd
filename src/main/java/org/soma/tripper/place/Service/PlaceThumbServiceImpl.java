@@ -18,4 +18,9 @@ public class PlaceThumbServiceImpl implements PlaceThumbService {
     public Optional<PlaceThumb> findThumbByNum(int num) {
         return placeThumbRepository.findByThumbnum(num);
     }
+
+    @Override
+    public PlaceThumb save(PlaceThumb placeThumb) {
+        return placeThumbRepository.save(placeThumb);
+    }
 }

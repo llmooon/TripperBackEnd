@@ -48,7 +48,7 @@ public class ScheduleController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String PYTHON_SERVER_TEST_URL="http://localhost:8080/schedule/testML";
-    private static final String PYTHON_SERVER_URL="http://djangoenv-env.f8jvbshimw.ap-northeast-2.elasticbeanstalk.com/recommend/1/?";
+    private static final String PYTHON_SERVER_URL="http://djangoenv-env.f8jvbshimw.ap-northeast-2.elasticbeanstalk.com/recommend/2/?";
     @Autowired
     UserService userService;
 
@@ -163,7 +163,7 @@ public class ScheduleController {
     }
 
     private List<Day> sendML(MLDTO mldto) throws Exception{
-        String url = PYTHON_SERVER_URL+"shopping="+mldto.getShopping()
+        String url = PYTHON_SERVER_URL+"day="+mldto.getDays()+"&shopping="+mldto.getShopping()
                 +"&food="+mldto.getFood()+"&tourist="+mldto.getTourist()+"&culture="+mldto.getCulture()+"&entertainment="+mldto.getEntertainment();
         URI uri = URI.create(url);
         RestTemplate restTemplate=new RestTemplate();
@@ -174,43 +174,67 @@ public class ScheduleController {
 
         List<Day> dayList=new ArrayList<>();
         List<List<Schedule>> scheduleList = new ArrayList<>();
-        scheduleList.add(new ArrayList<>());
 
-        ZonedDateTime d = ZonedDateTime.parse((String)((JSONObject)json.get(0)).get("recommend_time"));
-        LocalDateTime beforeday = d.toLocalDateTime();
-        int cnt=0;
         for(int i=0;i<json.size();i++){
-            JSONObject tmp = (JSONObject) json.get(i);
+            scheduleList.add(new ArrayList<>());
+            JSONObject daylistjson = (JSONObject) json.get(i);
+            JSONArray mldaylist = (JSONArray) daylistjson.get("course");
 
-            ZonedDateTime tmptime=ZonedDateTime.parse((String)tmp.get("recommend_time"));
-            LocalDateTime date1=tmptime.toLocalDateTime();
-            int place_num= ((Long)tmp.get("trip_id")).intValue();
-            Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong place_nium"));
+            for(int j=0;j<mldaylist.size();j++){
+                JSONObject tmp = (JSONObject) mldaylist.get(j);
+                ZonedDateTime tmptime=ZonedDateTime.parse((String)tmp.get("recommend_time"));
+                LocalDateTime date1=tmptime.toLocalDateTime();
+                int place_num= ((Long)tmp.get("trip_id")).intValue();
+                Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong ML place_nium"));
 
-            if(date1.getDayOfMonth()!=beforeday.getDayOfMonth()) {
-                cnt++;
-                Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
-                        .day(cnt)
+                Schedule schedule = Schedule.builder()
+                        .daynum(i+1)
+                        .startTime(date1)
+                        .place(place)
                         .build();
-                dayList.add(day);
-                scheduleList.add(new ArrayList<>());
+                scheduleList.get(i).add(schedule);
             }
-            beforeday=date1;
-
-            Schedule schedule = Schedule.builder()
-                    .daynum(cnt)
-                    .startTime(date1)
-                    .place(place)
-
+            Day day = Day.builder().schedulelist(scheduleList.get(i))
+                    .day(i+1)
                     .build();
-            scheduleList.get(cnt).add(schedule);
+            dayList.add(day);
         }
-        cnt++;
-        Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
-                .day(cnt)
-                .build();
-        dayList.add(day);
-        scheduleList.add(new ArrayList<>());
+
+//        ZonedDateTime d = ZonedDateTime.parse((String)((JSONObject)json.get(0)).get("recommend_time"));
+//        LocalDateTime beforeday = d.toLocalDateTime();
+//        int cnt=0;
+//
+//        for(int i=0;i<json.size();i++){
+//            JSONObject tmp = (JSONObject) json.get(i);
+//
+//            ZonedDateTime tmptime=ZonedDateTime.parse((String)tmp.get("recommend_time"));
+//            LocalDateTime date1=tmptime.toLocalDateTime();
+//            int place_num= ((Long)tmp.get("trip_id")).intValue();
+//            Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong place_nium"));
+//
+//            if(date1.getDayOfMonth()!=beforeday.getDayOfMonth()) {
+//                cnt++;
+//                Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
+//                        .day(cnt)
+//                        .build();
+//                dayList.add(day);
+//                scheduleList.add(new ArrayList<>());
+//            }
+//            beforeday=date1;
+//
+//            Schedule schedule = Schedule.builder()
+//                    .daynum(cnt)
+//                    .startTime(date1)
+//                    .place(place)
+//                    .build();
+//            scheduleList.get(cnt).add(schedule);
+//        }
+//        cnt++;
+//        Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
+//                .day(cnt)
+//                .build();
+//        dayList.add(day);
+//        scheduleList.add(new ArrayList<>());
         return dayList;
     }
 }

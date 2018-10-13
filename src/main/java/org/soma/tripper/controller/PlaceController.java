@@ -1,5 +1,6 @@
 package org.soma.tripper.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -16,6 +17,7 @@ import org.soma.tripper.place.entity.PlacePhoto;
 import org.soma.tripper.place.entity.PlaceThumb;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Review;
+import org.soma.tripper.review.entity.Thumb;
 import org.soma.tripper.review.service.DetailsService;
 import org.soma.tripper.review.service.ReviewService;
 import org.soma.tripper.user.domain.User;
@@ -53,6 +55,9 @@ public class PlaceController {
 
     @Autowired
     ReviewService reviewService;
+
+    @Autowired
+    PlaceThumbService placeThumbService;
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -99,34 +104,42 @@ public class PlaceController {
     }
 
     @GetMapping(value="/makeImg")
+    @ApiOperation(notes = "Don't touch!",value = "don't touch")
     public void makeImg() throws Exception {
         String clientId = "4WWZY0LHZ1bDkTYp6oqk";
         String clientSecret = "BAC0kFG8Cz";
         String url = "https://openapi.naver.com/v1/search/image?query=";
-        String next=" &display=3&start=1&sort=sim";
+        String next=" &display=5&start=1&sort=sim";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("X-Naver-Client-Id", clientId);
         httpHeaders.add("X-Naver-Client-Secret", clientSecret);
 
+        PlaceThumb thumb=placeThumbService.findThumbByNum(0).orElseThrow(()->new NoSuchDataException("erroer place thumb num"));
+
+
         JSONParser jsonParser = new JSONParser();
-        List<Place> places = placeService.getAllPlace();
+        List<Place> places = placeService.findPlaceByThumb(thumb);
+        List<Place> updateplaces = new ArrayList<>();
         for (Place p: places) {
-            String placeName = URLEncoder.encode(p.getName(),"utf-8");
-            ResponseEntity<String> responseEntity = restTemplate.exchange(url+placeName+next, HttpMethod.GET,new HttpEntity(httpHeaders),String.class);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(url+p.getName()+next, HttpMethod.GET,new HttpEntity(httpHeaders),String.class);
             String result = responseEntity.getBody();
             JSONObject jsonObject = (JSONObject)jsonParser.parse(result);
             JSONArray jsonArray = (JSONArray) jsonObject.get("items");
             for(int i=0;i<jsonArray.size();i++){
                 JSONObject obj = (JSONObject) jsonArray.get(i);
                 String link = (String)obj.get("link");
-                if(i==0) p.setThumb(PlaceThumb.builder().bucket(link).build());
+                if(i==0) {
+                    PlaceThumb placeThumb = placeThumbService.save(PlaceThumb.builder().bucket(link).build());
+                    p.setThumb(placeThumb);
+                }
 
                 p.addPhoto(PlacePhoto.builder().bucket(link).build());
             }
-            placeService.updatePlace(p);
+           updateplaces.add(p);
         }
+        placeService.updatePlaceList(updateplaces);
 
     }
 }

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PlaceThumbService {
     Optional<PlaceThumb> findThumbByNum(int num);
+    PlaceThumb save(PlaceThumb placeThumb);
 }
