@@ -35,4 +35,12 @@ public class Schedule {
         this.place=place;
         this.startTime=startTime;
     }
+
+    public void setPlace(Place place) {
+        this.place = place;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
 }

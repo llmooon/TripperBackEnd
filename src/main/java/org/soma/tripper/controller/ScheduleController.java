@@ -1,5 +1,6 @@
 package org.soma.tripper.controller;
 
+import com.amazonaws.services.dynamodbv2.xspec.NULL;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.json.simple.JSONArray;
@@ -17,6 +18,7 @@ import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.schedule.dto.RecomendedPlace;
 import org.soma.tripper.schedule.dto.ScheduleDTO;
+import org.soma.tripper.schedule.dto.UpdateScheduleDTO;
 import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.schedule.service.ScheduleService;
@@ -31,14 +33,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/schedule")
@@ -93,26 +91,23 @@ public class ScheduleController {
         return new ResponseEntity<>(seqDTOList,HttpStatus.OK);
     }
 
-    
+    @ApiOperation(value="update Schedule", notes = "시간 없데이트는 나중에... 흑")
+    @PutMapping("update")
+    public ResponseEntity<SeqDTO> updateSchedule(@RequestBody UpdateScheduleDTO updateScheduleDTO){
+       Seq seq = seqService.loadSeq(updateScheduleDTO.getSeqnum()).orElseThrow(()-> new NoSuchDataException("없는 seqnum"));
+       Place newplace = placeService.findPlaceByNum(updateScheduleDTO.getNewPlacenum()).orElseThrow(()-> new NoSuchDataException("없는 placenum"));
+       List<Schedule> scheduleList = seq.getDayList().get(updateScheduleDTO.getDay()-1).getSchedulelist();
+        for (Schedule s:scheduleList) {
+            if(s.getPlace().getPlace_num()==updateScheduleDTO.getBeforePlacenum()){
+                s.setPlace(newplace);
+               // s.setStartTime(updateScheduleDTO.getStartTime());
+                break;
+            }
+        }
+       seqService.modifySeq(seq);
+        return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
+    }
 
-//    @ApiOperation(value="update Schedule",notes = "계획 수정")
-//    @PostMapping("/update")
-//    public ResponseEntity<SeqDTO> updateSchedule(@RequestBody SeqDTO seqDTO){
-//        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
-//        Seq info = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("없는 정보"));
-//        seqService.deleteSeq(seqDTO.getSeqnum());
-//
-//        Seq seq = seqService.insertSeq(
-//                Seq.builder()
-//                .user(user)
-//                .dayList(seqDTO.getDayList())
-//                .fromdate(seqDTO.getFromdate())
-//                .toDate(seqDTO.getToDate())
-//                .build()
-//        );
-//
-//       return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
-//    }
 
     @PutMapping("/inputScheduleName")
     public ResponseEntity<SeqDTO> inputScheduleName(@RequestBody ScheduleDTO scheduleDTO){
@@ -121,20 +116,6 @@ public class ScheduleController {
         seqService.modifySeq(seq);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-//    @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
-//    @GetMapping("/testML")
-//    public ResponseEntity<List<Integer>> testsendAllSchedule(){
-//        List<Place> places=placeService.getAllPlace();
-//        ArrayList<Integer> placeList = new ArrayList<>();
-//        int cnt=0;
-//        for(Place p : places){
-//            placeList.add(p.getPlace_num());
-//            cnt++;
-//            if(cnt>10) break;
-//        }
-//        return new ResponseEntity<>(placeList,HttpStatus.OK);
-//    }
 
     @GetMapping("/SearchingByCategory/{version}/{beforePlaceNum}/{page}")
     @ApiOperation(value="version 값에 따른 카테고리별 장소 반환/ 관광지 :1 //맛집 :2 // 스포츠 :3 // 쇼핑 :4 // 숙박:5 // 공원 :6 // 야경 :7  ")
@@ -190,4 +171,39 @@ public class ScheduleController {
         }
         return dayList;
     }
+
+    //    @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
+//    @GetMapping("/testML")
+//    public ResponseEntity<List<Integer>> testsendAllSchedule(){
+//        List<Place> places=placeService.getAllPlace();
+//        ArrayList<Integer> placeList = new ArrayList<>();
+//        int cnt=0;
+//        for(Place p : places){
+//            placeList.add(p.getPlace_num());
+//            cnt++;
+//            if(cnt>10) break;
+//        }
+//        return new ResponseEntity<>(placeList,HttpStatus.OK);
+//    }
+
+//    @ApiOperation(value="update Schedule",notes = "계획 수정")
+//    @PostMapping("/update")
+//    public ResponseEntity<SeqDTO> updateSchedule(@RequestBody SeqDTO seqDTO){
+//        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+//        Seq info = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("없는 정보"));
+//        seqService.deleteSeq(seqDTO.getSeqnum());
+//
+//        Seq seq = seqService.insertSeq(
+//                Seq.builder()
+//                .user(user)
+//                .dayList(seqDTO.getDayList())
+//                .fromdate(seqDTO.getFromdate())
+//                .toDate(seqDTO.getToDate())
+//                .build()
+//        );
+//
+//       return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
+//    }
+
+
 }
