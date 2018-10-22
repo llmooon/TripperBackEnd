@@ -77,6 +77,7 @@ public class ScheduleController {
                 .user(user)
                 .build();
 
+        Seq result = seqService.insertSeq(seq);
         return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
@@ -92,38 +93,26 @@ public class ScheduleController {
         return new ResponseEntity<>(seqDTOList,HttpStatus.OK);
     }
 
-    @ApiOperation(value="add Schedule",notes = "Zepplin Schedule 화면에서 스케줄 조정 후 완료 누른후.")
-    @PostMapping("add")
-    public ResponseEntity<SeqDTO> addSchedule(@RequestBody SeqDTO seqDTO){
-        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+    
 
-        Seq seq = Seq.builder()
-                .dayList(seqDTO.getDayList())
-                .user(user)
-                .build();
-
-        Seq result  = seqService.insertSeq(seq);
-        return new ResponseEntity<>(result.toDTO(),HttpStatus.OK);
-    }
-
-    @ApiOperation(value="update Schedule",notes = "계획 수정")
-    @PostMapping("/update")
-    public ResponseEntity<SeqDTO> updateSchedule(@RequestBody SeqDTO seqDTO){
-        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
-        Seq info = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("없는 정보"));
-        seqService.deleteSeq(seqDTO.getSeqnum());
-
-        Seq seq = seqService.insertSeq(
-                Seq.builder()
-                .user(user)
-                .dayList(seqDTO.getDayList())
-                .fromdate(seqDTO.getFromdate())
-                .toDate(seqDTO.getToDate())
-                .build()
-        );
-
-       return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
-    }
+//    @ApiOperation(value="update Schedule",notes = "계획 수정")
+//    @PostMapping("/update")
+//    public ResponseEntity<SeqDTO> updateSchedule(@RequestBody SeqDTO seqDTO){
+//        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+//        Seq info = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("없는 정보"));
+//        seqService.deleteSeq(seqDTO.getSeqnum());
+//
+//        Seq seq = seqService.insertSeq(
+//                Seq.builder()
+//                .user(user)
+//                .dayList(seqDTO.getDayList())
+//                .fromdate(seqDTO.getFromdate())
+//                .toDate(seqDTO.getToDate())
+//                .build()
+//        );
+//
+//       return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
+//    }
 
     @PutMapping("/inputScheduleName")
     public ResponseEntity<SeqDTO> inputScheduleName(@RequestBody ScheduleDTO scheduleDTO){
@@ -133,19 +122,19 @@ public class ScheduleController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
-    @GetMapping("/testML")
-    public ResponseEntity<List<Integer>> testsendAllSchedule(){
-        List<Place> places=placeService.getAllPlace();
-        ArrayList<Integer> placeList = new ArrayList<>();
-        int cnt=0;
-        for(Place p : places){
-            placeList.add(p.getPlace_num());
-            cnt++;
-            if(cnt>10) break;
-        }
-        return new ResponseEntity<>(placeList,HttpStatus.OK);
-    }
+//    @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
+//    @GetMapping("/testML")
+//    public ResponseEntity<List<Integer>> testsendAllSchedule(){
+//        List<Place> places=placeService.getAllPlace();
+//        ArrayList<Integer> placeList = new ArrayList<>();
+//        int cnt=0;
+//        for(Place p : places){
+//            placeList.add(p.getPlace_num());
+//            cnt++;
+//            if(cnt>10) break;
+//        }
+//        return new ResponseEntity<>(placeList,HttpStatus.OK);
+//    }
 
     @GetMapping("/SearchingByCategory/{version}/{beforePlaceNum}/{page}")
     @ApiOperation(value="version 값에 따른 카테고리별 장소 반환/ 관광지 :1 //맛집 :2 // 스포츠 :3 // 쇼핑 :4 // 숙박:5 // 공원 :6 // 야경 :7  ")
@@ -199,42 +188,6 @@ public class ScheduleController {
                     .build();
             dayList.add(day);
         }
-
-//        ZonedDateTime d = ZonedDateTime.parse((String)((JSONObject)json.get(0)).get("recommend_time"));
-//        LocalDateTime beforeday = d.toLocalDateTime();
-//        int cnt=0;
-//
-//        for(int i=0;i<json.size();i++){
-//            JSONObject tmp = (JSONObject) json.get(i);
-//
-//            ZonedDateTime tmptime=ZonedDateTime.parse((String)tmp.get("recommend_time"));
-//            LocalDateTime date1=tmptime.toLocalDateTime();
-//            int place_num= ((Long)tmp.get("trip_id")).intValue();
-//            Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong place_nium"));
-//
-//            if(date1.getDayOfMonth()!=beforeday.getDayOfMonth()) {
-//                cnt++;
-//                Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
-//                        .day(cnt)
-//                        .build();
-//                dayList.add(day);
-//                scheduleList.add(new ArrayList<>());
-//            }
-//            beforeday=date1;
-//
-//            Schedule schedule = Schedule.builder()
-//                    .daynum(cnt)
-//                    .startTime(date1)
-//                    .place(place)
-//                    .build();
-//            scheduleList.get(cnt).add(schedule);
-//        }
-//        cnt++;
-//        Day day = Day.builder().schedulelist(scheduleList.get(cnt-1))
-//                .day(cnt)
-//                .build();
-//        dayList.add(day);
-//        scheduleList.add(new ArrayList<>());
         return dayList;
     }
 }
