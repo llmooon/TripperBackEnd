@@ -42,11 +42,11 @@ public class SearchController {
         return new ResponseEntity<>(search,HttpStatus.OK);
     }
 
-    @GetMapping(value="/place/{place}/{page}")
-    @ApiOperation(value="search place", notes="장소 이름 입력/ 페이지 입력")
-    public ResponseEntity<List<SimplePlaceDTO>> searchPlace(@PathVariable String place, @PathVariable int page){
-        int size = 20;
-        PageRequest request;
+        @GetMapping(value="/place/{place}/{page}")
+        @ApiOperation(value="search place", notes="장소 이름 입력/ 페이지 입력")
+        public ResponseEntity<List<SimplePlaceDTO>> searchPlace(@PathVariable String place, @PathVariable int page){
+            int size = 20;
+            PageRequest request;
         request=PageRequest.of(page, size);
         Page<Place> result = placeService.findPlaceByName(request,place);
         List<SimplePlaceDTO> results=new ArrayList<>();

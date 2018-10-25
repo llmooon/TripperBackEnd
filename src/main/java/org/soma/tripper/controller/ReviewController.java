@@ -129,6 +129,8 @@ public class ReviewController {
     @GetMapping("/load/{reviewnum}")
     public ResponseEntity<ReviewByDayDTO> LoadReviewByreviewnum(@PathVariable int reviewnum){
         Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 reviewnum"));
+        review.setView(review.getView()+1);
+        reviewService.uploadReview(review);
         Seq seq = seqService.loadSeq(review.getSeqnum()).orElseThrow(()->new NoSuchDataException("잘못된 seqnum"));
 
 

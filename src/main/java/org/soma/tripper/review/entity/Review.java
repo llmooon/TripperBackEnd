@@ -66,4 +66,7 @@ public class Review extends BaseTimeEntity {
         this.seqnum=seqnum;
     }
 
+    public void setView(int view) {
+        this.view = view;
+    }
 }
