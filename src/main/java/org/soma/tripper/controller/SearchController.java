@@ -6,11 +6,14 @@ import io.swagger.annotations.ApiOperation;
 import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.SearchService;
+import org.soma.tripper.place.Service.SeqService;
 import org.soma.tripper.place.dto.SimplePlaceDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Search;
 import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.entity.Review;
+import org.soma.tripper.review.service.ReviewService;
+import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sun.applet.Main;
 
 import javax.validation.constraints.Null;
 import java.util.ArrayList;
@@ -35,6 +39,15 @@ public class SearchController {
     @Autowired
     PlaceService placeService;
 
+    @Autowired
+    ReviewService reviewService;
+
+    @Autowired
+    SeqService seqService;
+
+    @Autowired
+    UserService userService;
+
     @GetMapping(value = "/region/{region}")
     @ApiOperation(value="Search Region",notes = "지역 검색")
     public ResponseEntity<List<Search>> searchwhere(@PathVariable String region){
@@ -42,9 +55,9 @@ public class SearchController {
         return new ResponseEntity<>(search,HttpStatus.OK);
     }
 
-        @GetMapping(value="/place/{place}/{page}")
-        @ApiOperation(value="search place", notes="장소 이름 입력/ 페이지 입력")
-        public ResponseEntity<List<SimplePlaceDTO>> searchPlace(@PathVariable String place, @PathVariable int page){
+    @GetMapping(value="/place/{place}/{page}")
+    @ApiOperation(value="search place", notes="장소 이름 입력/ 페이지 입력")
+    public ResponseEntity<List<SimplePlaceDTO>> searchPlace(@PathVariable String place, @PathVariable int page){
             int size = 20;
             PageRequest request;
         request=PageRequest.of(page, size);
@@ -61,6 +74,28 @@ public class SearchController {
         }
         return new ResponseEntity<>(results,HttpStatus.OK);
     }
+
+    @GetMapping(value="/review/{review}/{page}")
+    @ApiOperation(value="search review")
+    public ResponseEntity<List<MainReviewDTO>> searchReview(@PathVariable String review, @PathVariable int page){
+        PageRequest request=PageRequest.of(page,20);
+        Page<Review> res = reviewService.loadReviewByStr(review,request);
+        List<MainReviewDTO> reviewDTOS = new ArrayList<>();
+        for(Review r: res){
+            reviewDTOS.add(
+                    MainReviewDTO.builder()
+                    .reviewnum(r.getReviewnum())
+                    .photo(r.getThumb().getBucket())
+                    .time(r.getCreatedDate())
+                    .writer(userService.findUserByUsernum(r.getUsernum()).get().getEmail())
+                    .title(seqService.loadSeq(r.getSeqnum()).get().getTitle())
+                    .build());
+        }
+
+        return new ResponseEntity<>(reviewDTOS,HttpStatus.OK);
+
+    }
+
 
     @GetMapping(value="/makeSearchDbToPlaceDb")
     @ApiOperation(value="Make Search DB",notes = "장소 DB를 Search DB에 저장합니다. 주변 인근 지역을 추천하기 위해 따로 두었습니다.")

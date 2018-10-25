@@ -41,21 +41,11 @@ public class ReviewServiceImpl implements ReviewService {
     public Optional<Review> loadReviewById(int num) {
         return reviewRepository.findById(num);
     }
-//
-//    @Override
-//    public Review uploadReview(Review review) {
-//        return reviewRepository.save(review);
-//    }
-//
-//    @Override
-//    public List<Review> loadMainReview() {
-//        return reviewRepository.findAll();
-//    }
-//
-//    @Override
-//    public Optional<Review> loadReviewByUsernumAndScheduleNum(int usernum,int schedulenum) {
-//        return reviewRepository.findReviewByUsernumAndSchedulenum(usernum,schedulenum);
-//    }
+
+    @Override
+    public Page<Review> loadReviewByStr(String str,Pageable pageable) {
+        return reviewRepository.findReviewBystr(str,pageable);
+    }
 }
 
 

@@ -13,7 +13,7 @@ public interface ReviewService {
     Page<Review> loadMainReviewByPage(Pageable page);
     Optional<Review> loadReviewByUserAndSeq(int usernum, int seqnum);
     Optional<Review> loadReviewById(int num);
-
+    Page<Review> loadReviewByStr(String str,Pageable pageable);
 
 }
 
