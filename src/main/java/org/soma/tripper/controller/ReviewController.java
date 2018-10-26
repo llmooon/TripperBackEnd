@@ -89,7 +89,7 @@ public class ReviewController {
 
     @ApiOperation(value="upload review only content",notes = "사진 업로드")
     @PostMapping(value = "/uploadPhoto")
-    public ResponseEntity<ReviewDTO> uploadPhoto(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam int schedulenum,
+    public ResponseEntity<String> uploadPhoto(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam int schedulenum,
                                                    @RequestParam MultipartFile file){
 
         int usernum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
@@ -97,14 +97,15 @@ public class ReviewController {
         Schedule schedule = scheduleService.findScheduleById(schedulenum).orElseThrow(()->new NoSuchDataException("잘못된 schedule"));
         Details details = detailsService.loadDetailsBySchedule(schedule).orElseThrow(()->new NoSuchDataException("해당 리뷰 정보 없음."));
         ImagePath imagePath = this.amazonClient.uploadFile(file);
-        details.addPhoto(Photo.builder().bucket(s3Url+imagePath.getDateName()+"/"+imagePath.getFileName()).build());
+        String imgUrl = s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName();
+        details.addPhoto(Photo.builder().bucket(imgUrl).build());
         detailsService.save(details);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(imgUrl,HttpStatus.OK);
     }
 
     @ApiOperation(value="upload Main Photo",notes = "대표 리뷰 사진 등록/수정")
     @PostMapping(value = "/uploadMainPhoto")
-    public ResponseEntity<ReviewDTO> upload(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam MultipartFile file){
+    public ResponseEntity<String> upload(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam MultipartFile file){
         int usernum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
         Review review = reviewService.loadReviewByUserAndSeq(usernum,seqnum).orElseThrow(()->new NoSuchDataException("없는 seqnum"));
         if(review.getThumb()!=null){
@@ -112,9 +113,10 @@ public class ReviewController {
             amazonClient.deleteFileFromS3Bucket(url);
         }
         ImagePath imagePath = this.amazonClient.uploadFile(file);
-        review.setThumb(Thumb.builder().bucket(s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName()).build());
+        String imgUrl = s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName();
+        review.setThumb(Thumb.builder().bucket(imgUrl).build());
         reviewService.uploadReview(review);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(imgUrl,HttpStatus.OK);
     }
 
 
@@ -195,9 +197,14 @@ public class ReviewController {
         return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
     }
 
-
-
+    @GetMapping(value="/deletePhoto/{str}")
+    public void deletePhoto(@RequestParam String str){
+        amazonClient.deleteFileFromS3Bucket(str);
+    }
 }
 
+
+
 // 1. 한글 파일 s3 upload 안됨.
-// 2. s3내 삭제 안됨.
+
+//upload photo 경로 리턴하기

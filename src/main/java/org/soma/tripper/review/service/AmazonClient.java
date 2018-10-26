@@ -41,6 +41,7 @@ public class AmazonClient {
     @Value("${amazonProperties.secretKey}")
     private String secretKey;
 
+    private String defaultUrl="https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/";
 
     @PostConstruct
     private void initializeAmazon() {
@@ -110,9 +111,9 @@ public class AmazonClient {
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
-    public String deleteFileFromS3Bucket(String fileUrl) {
-        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+    public void deleteFileFromS3Bucket(String fileUrl) {
+        String fileName = fileUrl.replace(defaultUrl,"");
         s3client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
-        return "Successfully deleted";
+        return;
     }
 }
