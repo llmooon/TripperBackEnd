@@ -64,6 +64,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-json', version: '2.0.5.RELEASE'
     compile group: 'org.apache.clerezza.ext', name: 'org.json.simple', version: '0.4'
 
+    //fcm
+    compile group: 'org.json', name: 'json', version: '20160810'
+
 
     compile('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
