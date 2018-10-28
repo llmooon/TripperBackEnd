@@ -67,6 +67,10 @@ dependencies {
     //fcm
     compile group: 'org.json', name: 'json', version: '20160810'
 
+    //email authentication
+    compile("org.springframework.boot:spring-boot-starter-mail")
+
+    
 
     compile('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')

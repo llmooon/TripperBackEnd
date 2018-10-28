@@ -8,8 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.user.domain.User;
+import org.soma.tripper.user.dto.Email;
 import org.soma.tripper.user.dto.LoginUserDTO;
 import org.soma.tripper.user.dto.UserDTO;
+import org.soma.tripper.user.service.EmailService;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    EmailService emailService;
 
     @PostMapping("/create")
     @ApiOperation(value="Register user",notes = "회원가입")
@@ -58,5 +63,14 @@ public class UserController {
                 .orElseThrow(()->new NoSuchDataException("회원 정보가 일치하지 않습니다."));
 
         return new ResponseEntity<>(user,HttpStatus.OK);
+    }
+
+    @GetMapping("/Emailtest/{addr}")
+    public void Emailtest(@PathVariable String addr) throws Exception{
+        send(addr);
+    }
+
+    public void send(String addr) throws Exception{
+        emailService.sendMail(new Email("Tripper",addr,"찍찍","귀여운 찍찍이 안뇽"));
     }
 }

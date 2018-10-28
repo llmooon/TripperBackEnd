@@ -17,6 +17,16 @@ spring:
     multipart:
       max-file-size: 50000KB
       max-request-size: 50000KB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: llmooon1202
+    password: hs466831by59
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
 ##MultiPart
 
 amazonProperties:
@@ -25,5 +35,4 @@ amazonProperties:
   secretKey: bMnsr7bYbMIT7oHMi/gwDLA/2zGjFsPZImNIAwdl
   bucketName: tripper-bucket
   region : ap-northeast-2
-
 
