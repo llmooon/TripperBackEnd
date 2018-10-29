@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +23,10 @@ public class PushController {
     @Autowired
     AndroidPushNotificationService androidPushNotificationService;
 
-    @RequestMapping(value="/send",method= RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> send()throws Exception{
+    @RequestMapping(value="/send/{token}",method= RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> send(@PathVariable String token)throws Exception{
         JSONObject body = new JSONObject();
-        body.put("to","/topics/"+TOPIC);
+        body.put("to",token);
         body.put("priority","high");
 
         JSONObject notification = new JSONObject();

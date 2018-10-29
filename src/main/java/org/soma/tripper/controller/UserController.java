@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -71,6 +73,10 @@ public class UserController {
     }
 
     public void send(String addr) throws Exception{
-        emailService.sendMail(new Email("Tripper",addr,"찍찍","귀여운 찍찍이 안뇽"));
+        Map<String,Object> model = new HashMap();
+        model.put("name","tripper.com");
+        //model.put("location","tripper");
+        //model.put("signature","no...");
+        emailService.sendMail(new Email("Tripper@tripper.com",addr,"email_test","hello",model));
     }
 }

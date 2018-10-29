@@ -70,7 +70,11 @@ dependencies {
     //email authentication
     compile("org.springframework.boot:spring-boot-starter-mail")
 
-    
+    //thymeleaf
+    compile group: 'org.thymeleaf', name: 'thymeleaf-spring4', version: '3.0.9.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+
 
     compile('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
