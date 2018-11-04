@@ -135,7 +135,6 @@ public class ReviewController {
         reviewService.uploadReview(review);
         Seq seq = seqService.loadSeq(review.getSeqnum()).orElseThrow(()->new NoSuchDataException("잘못된 seqnum"));
 
-
         List<DetailDTO> detail = review.toDetailDTO();
         List<DayDTO> dayDTOS = new ArrayList<>();
         List<ReadDetailDTO> readDetailDTOS = new ArrayList<>();
@@ -160,6 +159,7 @@ public class ReviewController {
                     .days(dayDTOS)
                     .seqnum(review.getSeqnum())
                     .user(user)
+                    .title(seq.getTitle())
                     .thumb(review.getThumb().getBucket())
                     .build();
         }
@@ -168,6 +168,7 @@ public class ReviewController {
                     .days(dayDTOS)
                     .seqnum(review.getSeqnum())
                     .user(user)
+                    .title(seq.getTitle())
                     .build();
         }
 

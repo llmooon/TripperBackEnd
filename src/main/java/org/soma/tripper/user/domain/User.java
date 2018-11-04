@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter
 @ToString
 @Entity
-//@NoArgsConstructor(access=AccessLevel.PROTECTED)
+@NoArgsConstructor(access=AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User implements Serializable {
     @Id
@@ -40,7 +40,6 @@ public class User implements Serializable {
         this.device_token=device_token;
     }
 
-    public User(){}
 
     public UserDTO toDTO(){
         return UserDTO.builder()
