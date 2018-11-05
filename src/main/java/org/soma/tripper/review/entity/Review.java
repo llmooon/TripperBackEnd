@@ -5,6 +5,7 @@ import org.soma.tripper.common.BaseTimeEntity;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.review.dto.DetailDTO;
 import org.soma.tripper.review.dto.MainReviewDTO;
+import org.soma.tripper.review.dto.ReviewDTO;
 
 import javax.persistence.*;
 import javax.xml.soap.Detail;
@@ -25,6 +26,7 @@ public class Review extends BaseTimeEntity {
     private int seqnum;
     private double mlrating;
     private int view;
+    private int isvalid;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="thumbnum")
@@ -37,11 +39,25 @@ public class Review extends BaseTimeEntity {
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "reviewnum")
-    private Collection<Details> details;
+    private List<Details> details;
+
+    public void setDetails(List<Details> details) {
+        this.details = details;
+    }
 
     public void adddetails(Details detail){
         if(details==null) details=new ArrayList<>();
         details.add(detail);
+    }
+
+    public ReviewDTO toReviewDTO(){
+        List<DetailDTO> detailDTOS = toDetailDTO();
+        return ReviewDTO.builder()
+                .reviewnum(this.reviewnum)
+                .reviews(detailDTOS)
+                .seqnum(this.seqnum)
+                .thumb(this.thumb)
+                .build();
     }
 
     public List<DetailDTO> toDetailDTO(){
@@ -55,15 +71,16 @@ public class Review extends BaseTimeEntity {
                     DetailDTO.builder()
                     .content(d.getContent())
                     .photos(photos)
-                    .schedulenum(d.getSchedule().getSchedulenum())
+                    .detailsnum(d.getDetailsnum())
                     .build());
         }
         return detailDTOS;
     }
 
-    @Builder Review(int usernum, int seqnum){
+    @Builder Review(int usernum, int seqnum,int isvalid){
         this.usernum=usernum;
         this.seqnum=seqnum;
+        this.isvalid=isvalid;
     }
 
     public void setView(int view) {

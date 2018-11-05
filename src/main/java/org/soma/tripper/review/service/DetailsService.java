@@ -12,4 +12,5 @@ public interface DetailsService {
     Optional<Details> loadDetailsBySchedule(Schedule schedule);
     Details save(Details details);
     Page<Details> loadDetailsByPlace(Pageable pageable, Place place);
+    Optional<Details> loadDetailsByDetailsnum(int id);
 }

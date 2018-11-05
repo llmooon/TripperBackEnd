@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
+@Setter
 @Entity
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,7 +24,7 @@ public class Details {
 
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "detailsnum")
-    private Collection<Photo> photos;
+    private List<Photo> photos;
 
     public void addPhoto(Photo p){
         if(photos==null) photos=new ArrayList<>();

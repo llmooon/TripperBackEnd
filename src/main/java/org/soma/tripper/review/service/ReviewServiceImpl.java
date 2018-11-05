@@ -28,8 +28,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Page<Review> loadMainReviewByPage(Pageable page) {
-        return reviewRepository.findAll(page);
+    public Page<Review> loadMainReviewByPage(Pageable pageable, int isvalid) {
+        return reviewRepository.findReviewsByIsvalid(isvalid,pageable);
     }
 
     @Override

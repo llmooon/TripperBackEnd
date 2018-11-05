@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface DetailsRepository extends JpaRepository<Details,Integer> {
     Optional<Details> findBySchedule(Schedule schedule);
     Page<Details> findBySchedule_Place(Pageable pageable, Place place);
+    Optional<Details> findByDetailsnum(int num);
 }

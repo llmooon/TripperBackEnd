@@ -17,4 +17,6 @@ public class DayServiceImpl implements DayService{
     public Optional<Day> findDaybyDaynum(int num) {
         return dayRepository.findDayByDaynum(num);
     }
+
+
 }

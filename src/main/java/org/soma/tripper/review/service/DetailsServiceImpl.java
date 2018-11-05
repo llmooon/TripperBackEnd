@@ -31,4 +31,9 @@ public class DetailsServiceImpl implements DetailsService{
     public Page<Details> loadDetailsByPlace(Pageable pageable, Place place) {
         return detailsRepository.findBySchedule_Place(pageable,place);
     }
+
+    @Override
+    public Optional<Details> loadDetailsByDetailsnum(int id) {
+        return detailsRepository.findByDetailsnum(id);
+    }
 }

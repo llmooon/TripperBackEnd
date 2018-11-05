@@ -10,9 +10,9 @@ import java.util.Optional;
 public interface ReviewService {
     Review uploadReview(Review review);
     Optional<List<Review>> loadReviewByUser(int user_num);
-    Page<Review> loadMainReviewByPage(Pageable page);
+    Page<Review> loadMainReviewByPage(Pageable page,int isvalid);
     Optional<Review> loadReviewByUserAndSeq(int usernum, int seqnum);
-    Optional<Review> loadReviewById(int num);
+    Optional<Review> loadReviewById(int num);//all
     Page<Review> loadReviewByStr(String str,Pageable pageable);
 
 }

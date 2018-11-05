@@ -16,6 +16,9 @@ import org.soma.tripper.place.dto.PurposeDTO;
 import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
+import org.soma.tripper.review.entity.Details;
+import org.soma.tripper.review.entity.Review;
+import org.soma.tripper.review.service.ReviewService;
 import org.soma.tripper.schedule.dto.RecomendedPlace;
 import org.soma.tripper.schedule.dto.ScheduleDTO;
 import org.soma.tripper.schedule.dto.UpdateScheduleDTO;
@@ -45,7 +48,6 @@ import java.util.List;
 public class ScheduleController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String PYTHON_SERVER_TEST_URL="http://localhost:8080/schedule/testML";
     private static final String PYTHON_SERVER_URL="http://djangoenv-env.f8jvbshimw.ap-northeast-2.elasticbeanstalk.com/recommend/2/?";
     @Autowired
     UserService userService;
@@ -58,6 +60,10 @@ public class ScheduleController {
 
     @Autowired
     SeqService seqService;
+
+    @Autowired
+    ReviewService reviewService;
+
 
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
     @PostMapping("/inputPurpose")
@@ -75,8 +81,19 @@ public class ScheduleController {
                 .user(user)
                 .totalday(purposeDTO.getDays())
                 .build();
-
         Seq result = seqService.insertSeq(seq);
+        //didn't test!
+        Review review= Review.builder()
+                .seqnum(result.getSeqnum())
+                .usernum(user.getUser_num())
+                .isvalid(0)
+                .build();
+        for (Day d:dayList) {
+            for(Schedule s:d.getSchedulelist()){
+                review.adddetails(Details.builder().schedule(s).build());
+            }
+        }
+        reviewService.uploadReview(review);
         return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
@@ -173,39 +190,5 @@ public class ScheduleController {
         }
         return dayList;
     }
-
-    //    @ApiOperation(value="Test with ML Server",notes = "테스트용입니다.")
-//    @GetMapping("/testML")
-//    public ResponseEntity<List<Integer>> testsendAllSchedule(){
-//        List<Place> places=placeService.getAllPlace();
-//        ArrayList<Integer> placeList = new ArrayList<>();
-//        int cnt=0;
-//        for(Place p : places){
-//            placeList.add(p.getPlace_num());
-//            cnt++;
-//            if(cnt>10) break;
-//        }
-//        return new ResponseEntity<>(placeList,HttpStatus.OK);
-//    }
-
-//    @ApiOperation(value="update Schedule",notes = "계획 수정")
-//    @PostMapping("/update")
-//    public ResponseEntity<SeqDTO> updateSchedule(@RequestBody SeqDTO seqDTO){
-//        User user = userService.findUserByEmail(seqDTO.getUser()).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
-//        Seq info = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("없는 정보"));
-//        seqService.deleteSeq(seqDTO.getSeqnum());
-//
-//        Seq seq = seqService.insertSeq(
-//                Seq.builder()
-//                .user(user)
-//                .dayList(seqDTO.getDayList())
-//                .fromdate(seqDTO.getFromdate())
-//                .toDate(seqDTO.getToDate())
-//                .build()
-//        );
-//
-//       return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
-//    }
-
 
 }
