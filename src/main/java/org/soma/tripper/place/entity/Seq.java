@@ -23,6 +23,7 @@ public class Seq {
     private Date fromdate;
     private Date toDate;
     private String title;
+    private int totalday;
 
     public void setTitle(String title) {
         this.title = title;
@@ -38,12 +39,13 @@ public class Seq {
 
 
     @Builder
-    public Seq(int seqnum,User user,List<Day> dayList,Date fromdate, Date toDate){
+    public Seq(int seqnum,User user,List<Day> dayList,Date fromdate, Date toDate,int totalday){
         this.seqnum=seqnum;
         this.user = user;
         this.dayList=dayList;
         this.fromdate=fromdate;
         this.toDate=toDate;
+        this.totalday=totalday;
     }
 
     public void setSchedulelist(List<Day> dayList) {

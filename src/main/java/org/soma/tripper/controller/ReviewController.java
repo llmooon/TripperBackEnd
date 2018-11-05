@@ -18,6 +18,7 @@ import org.soma.tripper.review.service.AmazonClient;
 import org.soma.tripper.review.service.DetailsService;
 import org.soma.tripper.review.service.ReviewService;
 import org.soma.tripper.schedule.entity.Schedule;
+import org.soma.tripper.schedule.service.DayService;
 import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
@@ -58,6 +59,9 @@ public class ReviewController {
 
     @Autowired
     SeqService seqService;
+
+    @Autowired
+    DayService dayService;
 
     private AmazonClient amazonClient;
 
@@ -138,17 +142,13 @@ public class ReviewController {
         List<DetailDTO> detail = review.toDetailDTO();
         List<DayDTO> dayDTOS = new ArrayList<>();
         List<ReadDetailDTO> readDetailDTOS = new ArrayList<>();
-        int days=0;
-        for (DetailDTO d: detail) {
-            logger.info(d.toString());
-            Schedule schedule =scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()-> new NoSuchDataException("error schedule num"));
-            int day = schedule.getDaynum();
-            ReadDetailDTO rd =ReadDetailDTO.builder().content(d.getContent()).photos(d.getPhotos()).schedule(schedule).build();
 
-            if(day!=days){
-                dayDTOS.add(DayDTO.builder().day(day).build());
-                days++;
-            }
+        for(int i=0;i<seq.getTotalday()-1;i++) dayDTOS.add(DayDTO.builder().day(i+1).build()); //set Day size
+
+        for (DetailDTO d: detail) {
+            Schedule schedule =scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()-> new NoSuchDataException("error schedule num"));
+            int day = dayService.findDaybyDaynum(schedule.getDaynum()).get().getDay();
+            ReadDetailDTO rd =ReadDetailDTO.builder().content(d.getContent()).photos(d.getPhotos()).schedule(schedule).build();
             dayDTOS.get(day-1).addDetails(rd);
         }
 

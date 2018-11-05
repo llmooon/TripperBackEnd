@@ -73,6 +73,7 @@ public class ScheduleController {
         Seq seq = Seq.builder()
                 .dayList(dayList)
                 .user(user)
+                .totalday(purposeDTO.getDays())
                 .build();
 
         Seq result = seqService.insertSeq(seq);

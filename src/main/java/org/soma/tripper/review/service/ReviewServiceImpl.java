@@ -39,7 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Optional<Review> loadReviewById(int num) {
-        return reviewRepository.findById(num);
+        return reviewRepository.findReviewByReviewnum(num);
     }
 
     @Override

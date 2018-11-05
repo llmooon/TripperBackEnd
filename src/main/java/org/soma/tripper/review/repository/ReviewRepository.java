@@ -13,6 +13,9 @@
 
     public interface ReviewRepository extends JpaRepository<Review,Integer> {
 
+
+        Optional<Review> findReviewByReviewnum(int reviewnum);
+
         Optional<List<Review>> findReviewByUsernum(int usernum);
         Optional<Review> findReviewByUsernumAndSeqnum(int usernum,int seqnum);
 

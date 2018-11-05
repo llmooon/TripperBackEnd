@@ -14,9 +14,10 @@ import java.util.List;
 public class Day {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @JsonIgnore
+    //@JsonIgnore
     private int daynum;
-    int day;
+
+    private int day;
     @JsonIgnore
     private int seqnum;
 
