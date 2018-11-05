@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/review")
@@ -87,6 +88,7 @@ public class ReviewController {
         for (DetailDTO d: reviewDTO.getReviews()) {
             review.adddetails(d.toEntity(scheduleService.findScheduleById(d.getSchedulenum()).orElseThrow(()->new NoSuchDataException("error schedulenum!"))));
         }
+        
         reviewService.uploadReview(review);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -171,7 +173,6 @@ public class ReviewController {
                     .title(seq.getTitle())
                     .build();
         }
-
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -184,17 +185,9 @@ public class ReviewController {
         else request=PageRequest.of(page, size, new Sort(Sort.Direction.DESC, "view"));
         Page<Review> result = reviewService.loadMainReviewByPage(request);
         List<Review> reviewList = result.getContent();
-        List<MainReviewDTO> reviewDTOList = new ArrayList<>();
-
-        for (Review r : reviewList) {
-            reviewDTOList.add(MainReviewDTO.builder()
-                    .reviewnum(r.getReviewnum())
-                    .photo(r.getThumb().getBucket())
-                    .time(r.getCreatedDate())
-                    .writer(userService.findUserByUsernum(r.getUsernum()).get().getEmail())
-                    .title(seqService.loadSeq(r.getSeqnum()).get().getTitle())
-                    .build());
-        }
+        List<MainReviewDTO> reviewDTOList = reviewList.stream()
+                .map(review -> ReviewToMainReviewDTO(review))
+                .collect(Collectors.toList());
         return new ResponseEntity<>(reviewDTOList,HttpStatus.OK);
     }
 
@@ -202,6 +195,17 @@ public class ReviewController {
     public void deletePhoto(@RequestParam String str){
         amazonClient.deleteFileFromS3Bucket(str);
     }
+
+    private MainReviewDTO ReviewToMainReviewDTO(Review r){
+        return MainReviewDTO.builder()
+                .reviewnum(r.getReviewnum())
+                .photo(r.getThumb().getBucket())
+                .time(r.getCreatedDate())
+                .writer(userService.findUserByUsernum(r.getUsernum()).get().getEmail())
+                .title(seqService.loadSeq(r.getSeqnum()).get().getTitle())
+                .build();
+    }
+
 }
 
 
