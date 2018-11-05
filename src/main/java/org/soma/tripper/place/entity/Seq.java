@@ -2,6 +2,7 @@ package org.soma.tripper.place.entity;
 
 import lombok.*;
 import org.soma.tripper.place.dto.SeqDTO;
+import org.soma.tripper.schedule.dto.MyScheduleDTO;
 import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.user.domain.User;
@@ -24,6 +25,7 @@ public class Seq {
     private Date toDate;
     private String title;
     private int totalday;
+    private String region;
 
     public void setTitle(String title) {
         this.title = title;
@@ -39,12 +41,13 @@ public class Seq {
 
 
     @Builder
-    public Seq(int seqnum,User user,List<Day> dayList,Date fromdate, Date toDate,int totalday){
+    public Seq(int seqnum,User user,List<Day> dayList,Date fromdate,String region, Date toDate,int totalday){
         this.seqnum=seqnum;
         this.user = user;
         this.dayList=dayList;
         this.fromdate=fromdate;
         this.toDate=toDate;
+        this.region=region;
         this.totalday=totalday;
     }
 
@@ -57,8 +60,18 @@ public class Seq {
                 .seqnum(this.getSeqnum())
                 .fromdate(this.getFromdate())
                 .toDate(this.getToDate())
+                .title(this.getTitle())
                 .user(this.user.getEmail())
                 .dayList(this.getDayList())
+                .build();
+    }
+    public MyScheduleDTO toMyDTO(){
+        return MyScheduleDTO.builder()
+                .fromdate(fromdate)
+                .title(title)
+                .toDate(toDate)
+                .seqnum(seqnum)
+                .region(region)
                 .build();
     }
 }

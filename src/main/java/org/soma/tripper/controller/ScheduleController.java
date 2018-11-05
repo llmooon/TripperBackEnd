@@ -19,6 +19,7 @@ import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Review;
 import org.soma.tripper.review.service.ReviewService;
+import org.soma.tripper.schedule.dto.MyScheduleDTO;
 import org.soma.tripper.schedule.dto.RecomendedPlace;
 import org.soma.tripper.schedule.dto.ScheduleDTO;
 import org.soma.tripper.schedule.dto.UpdateScheduleDTO;
@@ -79,6 +80,7 @@ public class ScheduleController {
         Seq seq = Seq.builder()
                 .dayList(dayList)
                 .user(user)
+                .region(purposeDTO.getRegion())
                 .totalday(purposeDTO.getDays())
                 .build();
         Seq result = seqService.insertSeq(seq);
@@ -97,16 +99,16 @@ public class ScheduleController {
         return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
-    @ApiOperation(value = "load Schedule",notes = "유저별 스케쥴 로드")
+    @ApiOperation(value = "menu - My Schedule (유저별 스케쥴 로드)")
     @GetMapping("load/{userid}")
-    public ResponseEntity<List<SeqDTO>> loadSchedule(@PathVariable String userid){
+    public ResponseEntity<List<MyScheduleDTO>> loadSchedule(@PathVariable String userid){
         User user = userService.findUserByEmail(userid).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
         List<Seq> seqList = seqService.loadSeqByUser(user).orElseThrow(()->new NoSuchDataException("빔"));
-        List<SeqDTO> seqDTOList=new ArrayList<>();
+        List<MyScheduleDTO> res=new ArrayList<>();
         for (Seq seq:seqList ) {
-            seqDTOList.add(seq.toDTO());
+            res.add(seq.toMyDTO());
         }
-        return new ResponseEntity<>(seqDTOList,HttpStatus.OK);
+        return new ResponseEntity<>(res,HttpStatus.OK);
     }
 
     @ApiOperation(value="update Schedule", notes = "시간 없데이트는 나중에... 흑")
