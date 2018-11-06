@@ -30,8 +30,18 @@ public class User implements Serializable {
     private int sex;
     private String device_token;
     private String url;
+    private String validateUrl;
+    private boolean isEnabled;
 
-    @Builder User(int user_num, String name, String email, String password, int sex,String device_token){
+    public void setValidateUrl(String validateUrl) {
+        this.validateUrl = validateUrl;
+    }
+
+    public void setIsEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
+    @Builder User(int user_num, String name, String email, String password, int sex, String device_token){
         this.sex=sex;
         this.user_num=user_num;
         this.name=name;

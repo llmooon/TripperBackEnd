@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/user")
@@ -39,14 +40,23 @@ public class UserController {
     @PostMapping("/create")
     @ApiOperation(value="Register user",notes = "회원가입")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO){ // 나중에 validator 사용해보기.
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) throws Exception{ // 나중에 validator 사용해보기.
         if(userDTO.getEmail()==null || userDTO.getPassword()==null || userDTO.getDevice_token()==null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if(userService.findUserByEmail(userDTO.getEmail()).isPresent()){
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        User user = userService.registerUser(userDTO).get();
+        String url = getkey();
+        Map<String,Object> model = new HashMap();
+        model.put("name","tripper.com");
+        model.put("url",url);
+        emailService.sendMail(new Email("Tripper@tripper.com",userDTO.getEmail(),"email_test","hello",model));
+
+        User user = userDTO.toEntity();
+        user.setIsEnabled(false);
+        user.setValidateUrl(url);
+        user = userService.registerUser(user).get();
         userDTO=user.toDTO();
         return new ResponseEntity<>(userDTO,HttpStatus.CREATED);
 
@@ -57,7 +67,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list"),
     })
-    public ResponseEntity<User> loginUser(@RequestBody LoginUserDTO loginUserDTO){
+    public ResponseEntity<User> loginUser(@RequestBody LoginUserDTO loginUserDTO) {
         UserDTO userDTO= loginUserDTO.toDTO(loginUserDTO);
         if(userDTO.getEmail()==null||userDTO.getPassword()==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -67,16 +77,27 @@ public class UserController {
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
-    @GetMapping("/Emailtest/{addr}")
-    public void Emailtest(@PathVariable String addr) throws Exception{
-        send(addr);
+    @GetMapping("/validate/{str}")
+    public ResponseEntity validateUser(@PathVariable String str){
+        User user = userService.validateUser(str).orElseThrow(()->new NoSuchDataException("잘못된 url 입니다."));
+        user.setIsEnabled(true);
+        userService.registerUser(user);
+        return new ResponseEntity("Success",HttpStatus.OK);
+
     }
 
-    public void send(String addr) throws Exception{
-        Map<String,Object> model = new HashMap();
-        model.put("name","tripper.com");
-        //model.put("location","tripper");
-        //model.put("signature","no...");
-        emailService.sendMail(new Email("Tripper@tripper.com",addr,"email_test","hello",model));
+
+    private String getkey(){
+        Random ran = new Random();
+        StringBuffer sb = new StringBuffer();
+        int num=0;
+        do{
+            num=ran.nextInt(75)+48;
+            if((num>=48 && num<=57) || (num>=65 && num<=90) || (num>=97 && num<=122)){
+                sb.append((char)num);
+            }
+            else continue;
+        }while(sb.length()<15);
+        return sb.toString();
     }
 }

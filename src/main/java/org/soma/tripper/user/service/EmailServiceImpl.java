@@ -29,12 +29,11 @@ public class EmailServiceImpl implements EmailService{
     @Override
     public void sendMail(Email email) throws MessagingException {
         System.out.println(email.toString());
+
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message,
                 MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                 StandardCharsets.UTF_8.name());
-
-        //helper.addAttachment("logo.png", new ClassPathResource("memorynotfound-logo.png"));
 
         Context context = new Context();
         context.setVariables(email.getModel());

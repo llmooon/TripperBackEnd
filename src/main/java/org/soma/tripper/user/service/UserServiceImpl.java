@@ -22,8 +22,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional//위치가 여기가 맞는가
-    public Optional<User> registerUser(UserDTO userDTO) {
-        return Optional.of(userRepository.save(userDTO.toEntity()));
+    public Optional<User> registerUser(User user) {
+        return Optional.of(userRepository.save(user));
     }
 
     @Override
@@ -39,5 +39,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public Optional<User> findUserByUsernum(int usernum) {
         return userRepository.findById(usernum);
+    }
+
+    @Override
+    public Optional<User> validateUser(String str) {
+        return userRepository.findUserByValidateUrl(str);
     }
 }

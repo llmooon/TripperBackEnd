@@ -48,6 +48,7 @@ public class TestController {
         User user = userRepository.findById(num).orElseThrow(()-> new NoSuchDataException());
         return seqRepository.findSeqsByUser(user).get();
     }
+
     @GetMapping("/getS")
     public List<Seq> getAllSchedule(){
         //User user = userRepository.findById(num).orElseThrow(()-> new NoSuchDataException());
