@@ -23,8 +23,8 @@
 
         //SELECT r.* from  Review r, User u, Seq s " WHERE (u.name=:str and u.user_num=r.usernum AND s.seqnum=r.seqnum)
         // OR (s.title LIKE CONCAT('%',:str,'%')) and  s.seqnum=r.seqnum and u.user_num= r.usernum
-        @Query(value = "select r.* from review r, user u, seq s where (u.name=:str and u.user_num=r.usernum and s.seqnum=r.seqnum and r.isvalid=1) " +
-                "or (s.title like concat('%',:str,'%') and s.seqnum=r.seqnum and u.user_num=r.usernum and r.isvalid=1) ",nativeQuery = true)
+        @Query(value = "select r.* from review r, user u, seq s where (u.name=:str and u.user_num=r.usernum and s.seqnum=r.seqnum) " +
+                "or (s.title like concat('%',:str,'%') and s.seqnum=r.seqnum and u.user_num=r.usernum) ",nativeQuery = true)
         Page<Review> findReviewBystr(@Param("str") String str, Pageable pageRequest);
 
     }

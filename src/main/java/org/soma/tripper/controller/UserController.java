@@ -7,11 +7,13 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
+import org.soma.tripper.user.domain.TempUser;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.dto.Email;
 import org.soma.tripper.user.dto.LoginUserDTO;
 import org.soma.tripper.user.dto.UserDTO;
 import org.soma.tripper.user.service.EmailService;
+import org.soma.tripper.user.service.TempUserService;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,9 @@ public class UserController {
     @Autowired
     EmailService emailService;
 
+    @Autowired
+    TempUserService tempUserService;
+
     @PostMapping("/create")
     @ApiOperation(value="Register user",notes = "회원가입")
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,20 +49,19 @@ public class UserController {
         if(userDTO.getEmail()==null || userDTO.getPassword()==null || userDTO.getDevice_token()==null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(userService.findUserByEmail(userDTO.getEmail()).isPresent()){
+        if(userService.findUserByEmail(userDTO.getEmail()).isPresent() || tempUserService.findUserByEmail(userDTO.getEmail()).isPresent()){
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
+
         String url = getkey();
         Map<String,Object> model = new HashMap();
         model.put("name","tripper.com");
         model.put("url",url);
-        emailService.sendMail(new Email("Tripper@tripper.com",userDTO.getEmail(),"email_test","hello",model));
+        emailService.sendMail(new Email("Tripper@tripper.com",userDTO.getEmail(),"tripper 가입을 축하 드립니다! ","hello",model));
 
-        User user = userDTO.toEntity();
-        user.setIsEnabled(false);
+        TempUser user = userDTO.toTempUserEntity();
         user.setValidateUrl(url);
-        user = userService.registerUser(user).get();
-        userDTO=user.toDTO();
+        tempUserService.registerTempUser(user);
         return new ResponseEntity<>(userDTO,HttpStatus.CREATED);
 
     }
@@ -79,13 +83,14 @@ public class UserController {
 
     @GetMapping("/validate/{str}")
     public ResponseEntity validateUser(@PathVariable String str){
-        User user = userService.validateUser(str).orElseThrow(()->new NoSuchDataException("잘못된 url 입니다."));
-        user.setIsEnabled(true);
+        TempUser tempUsermpuser = tempUserService.validateUser(str).orElseThrow(()->new NoSuchDataException("잘못된 url 입니다."));
+        User user = tempUsermpuser.toUser();
         userService.registerUser(user);
+        tempUserService.deleteTempUser(tempUsermpuser);
+
         return new ResponseEntity("Success",HttpStatus.OK);
 
     }
-
 
     private String getkey(){
         Random ran = new Random();

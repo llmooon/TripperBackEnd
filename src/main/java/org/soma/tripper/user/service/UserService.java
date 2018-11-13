@@ -12,5 +12,4 @@ public interface UserService {
     Optional<User> login(String id, String password);
     Optional<User> findUserByEmail(String user_email);
     Optional<User> findUserByUsernum(int usernum);
-    Optional<User> validateUser(String str);
 }

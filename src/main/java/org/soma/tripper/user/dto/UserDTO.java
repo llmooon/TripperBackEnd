@@ -2,6 +2,7 @@ package org.soma.tripper.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.soma.tripper.user.domain.TempUser;
 import org.soma.tripper.user.domain.User;
 
 @Getter
@@ -26,6 +27,16 @@ public class UserDTO {
                 .build();
     }
 
+    public TempUser toTempUserEntity(){
+        return TempUser.builder()
+                .email(email)
+                .password(password)
+                .name(name)
+                .sex(sex)
+                .device_token(device_token)
+                .build();
+    }
+
     @Builder
     public UserDTO(String email, String password, String name, int sex, String device_token) {
         this.email = email;
@@ -34,4 +45,6 @@ public class UserDTO {
         this.sex = sex;
         this.device_token = device_token;
     }
+
+
 }

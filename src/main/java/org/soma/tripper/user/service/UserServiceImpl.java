@@ -41,8 +41,4 @@ public class UserServiceImpl implements UserService{
         return userRepository.findById(usernum);
     }
 
-    @Override
-    public Optional<User> validateUser(String str) {
-        return userRepository.findUserByValidateUrl(str);
-    }
 }

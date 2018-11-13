@@ -2,20 +2,16 @@ package org.soma.tripper.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.soma.tripper.user.dto.UserDTO;
 
 import javax.persistence.*;
-import java.io.Serializable;
-
 
 @Getter
 @ToString
 @Entity
-@NoArgsConstructor(access=AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-public class User implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class TempUser {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int user_num;
 
     @Column(name = "email")
@@ -29,10 +25,14 @@ public class User implements Serializable {
     private String name;
     private int sex;
     private String device_token;
-    private String url;
+    private String validateUrl;
 
+    public void setValidateUrl(String validateUrl) {
+        this.validateUrl = validateUrl;
+    }
 
-    @Builder User( String name, String email, String password, int sex, String device_token){
+    @Builder
+    TempUser(String name, String email, String password, int sex, String device_token){
         this.sex=sex;
         this.name=name;
         this.password=password;
@@ -40,13 +40,12 @@ public class User implements Serializable {
         this.device_token=device_token;
     }
 
-
-    public UserDTO toDTO(){
-        return UserDTO.builder()
-                .email(email)
+    public User toUser(){
+        return User.builder()
+                .device_token(this.device_token)
+                .email(this.email)
                 .name(name)
-                .password(null)
-                .device_token(device_token)
+                .password(password)
                 .sex(sex)
                 .build();
     }
