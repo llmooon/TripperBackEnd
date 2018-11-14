@@ -73,7 +73,7 @@ public class AirPortController {
         return new ResponseEntity<>(res.getContent(),HttpStatus.OK);
     }
 
-    //didn't test.
+    //didn't TestPlace.
     @GetMapping("/findAirport/{deptCityCode}/{arrvCityCode}/{searchDate}")
     @ApiOperation(value="항공권 검색. deptcityCode=출발 도시 코드, arrvCityCode=도착 도시 코드, searchDate=yyyymmdd 형식으로.")
     public ResponseEntity<List<SearchAirPortDto>> searchAirport(@PathVariable String deptCityCode, @PathVariable String arrvCityCode, @PathVariable String searchDate){

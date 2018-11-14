@@ -1,5 +1,6 @@
 package org.soma.tripper.place.Service;
 
+import org.soma.tripper.place.dto.PlaceWithDistance;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.PlaceThumb;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ public interface PlaceService {
     List<Place> getAllPlace();
     Optional<Place>findPlaceByNum(int num);
     Page<Place> findPlaceByName(Pageable pageable, String name);
-    Page<Place> getPlaceByVersion(Pageable page,int version);
+    List<Object[]> getPlaceByVersion(int version, double averageLA, double averageLO, Pageable page);
     void updatePlace(Place place);
     void updatePlaceList(List<Place> places);
     List<Place> findPlaceByThumb(PlaceThumb placeThumb);

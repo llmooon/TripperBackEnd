@@ -30,8 +30,8 @@ public class PushController {
         body.put("priority","high");
 
         JSONObject notification = new JSONObject();
-        notification.put("title","test");
-        notification.put("body","push test");
+        notification.put("title","TestPlace");
+        notification.put("body","push TestPlace");
 
         JSONObject data = new JSONObject();
         data.put("data","data");

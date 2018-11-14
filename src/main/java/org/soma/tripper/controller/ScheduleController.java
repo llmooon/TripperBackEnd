@@ -12,19 +12,25 @@ import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.SeqService;
 import org.soma.tripper.place.dto.MLDTO;
+import org.soma.tripper.place.dto.PlaceWithDistance;
 import org.soma.tripper.place.dto.PurposeDTO;
 import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
+import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Review;
+import org.soma.tripper.review.entity.Thumb;
 import org.soma.tripper.review.service.ReviewService;
+import org.soma.tripper.review.service.ThumbService;
 import org.soma.tripper.schedule.dto.MyScheduleDTO;
 import org.soma.tripper.schedule.dto.RecomendedPlace;
 import org.soma.tripper.schedule.dto.ScheduleDTO;
 import org.soma.tripper.schedule.dto.UpdateScheduleDTO;
 import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
+import org.soma.tripper.schedule.repository.DayRepository;
+import org.soma.tripper.schedule.service.DayService;
 import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
@@ -41,6 +47,9 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/schedule")
@@ -65,6 +74,12 @@ public class ScheduleController {
     @Autowired
     ReviewService reviewService;
 
+    @Autowired
+    DayService dayService;
+
+    @Autowired
+    ThumbService thumbService;
+
 
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
     @PostMapping("/inputPurpose")
@@ -84,7 +99,7 @@ public class ScheduleController {
                 .totalday(purposeDTO.getDays())
                 .build();
         Seq result = seqService.insertSeq(seq);
-        //didn't test!
+        //didn't TestPlace!
         Review review= Review.builder()
                 .seqnum(result.getSeqnum())
                 .usernum(user.getUser_num())
@@ -138,16 +153,27 @@ public class ScheduleController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/SearchingByCategory/{version}/{beforePlaceNum}/{page}")
+    @GetMapping("/SearchingByCategory/{version}/{seqnum}/{daynum}/{page}")
     @ApiOperation(value="version 값에 따른 카테고리별 장소 반환/ 관광지 :1 //맛집 :2 // 스포츠 :3 // 쇼핑 :4 // 숙박:5 // 공원 :6 // 야경 :7  ")
-    public ResponseEntity<List<RecomendedPlace>> searchingByCategory(@PathVariable Integer version, @PathVariable Integer beforePlaceNum, @PathVariable Integer page){
-        Place place = placeService.findPlaceByNum(beforePlaceNum).orElseThrow(()-> new NoSuchDataException("잘못된 placenum"));
+    public ResponseEntity<List<RecomendedPlace>> searchingByCategory(@PathVariable Integer version, @PathVariable Integer seqnum, @PathVariable Integer daynum, @PathVariable Integer page){
+        List<Schedule> scheduleList = dayService.findDaybySeqnumAndDay(seqnum,daynum).get().getSchedulelist();
+
+        //스케쥴 일정의 평균 위도, 경도를 중심으로 카테고리별 장소 추천
+        double AverageLA=0, AverageLO=0;
+        for (Schedule s: scheduleList) {
+            AverageLA += s.getPlace().getLatitude();
+            AverageLO += s.getPlace().getLongtitude();
+        }
+        AverageLA= AverageLA/scheduleList.size();
+        AverageLO = AverageLO/scheduleList.size();
+
         PageRequest request;
         request= PageRequest.of(page,20);
-        Page<Place> placeList = placeService.getPlaceByVersion(request,version);
+        List<Object[]> placeList = placeService.getPlaceByVersion(version,AverageLA,AverageLO,request);
         List<RecomendedPlace> recomendedPlaces = new ArrayList<>();
-        for(Place p : placeList){
-            RecomendedPlace recomendedPlace = RecomendedPlace.builder().placenum(p.getPlace_num()).city(p.getCity()).name(p.getName()).picture(p.getThumb().getBucket()).build();
+        for(Object[] p : placeList){
+            String img = thumbService.findThumbByNum((Integer) p[10]).get().getBucket();
+            RecomendedPlace recomendedPlace = RecomendedPlace.builder().placenum((Integer) p[0]).city((String)p[1]).name((String)p[6]).picture(img).build();
             recomendedPlaces.add(recomendedPlace);
         }
         return new ResponseEntity<>(recomendedPlaces,HttpStatus.OK);
@@ -192,5 +218,4 @@ public class ScheduleController {
         }
         return dayList;
     }
-
 }

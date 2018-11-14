@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface DayRepository extends JpaRepository<Day,Integer> {
     Optional<Day> findDayByDaynum(int daynum);
+    Optional<Day> findDayBySeqnumAndDay(int seqnum, int day);
 }

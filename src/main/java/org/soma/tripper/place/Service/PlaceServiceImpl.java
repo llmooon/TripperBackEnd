@@ -1,5 +1,6 @@
 package org.soma.tripper.place.Service;
 
+import org.soma.tripper.place.dto.PlaceWithDistance;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.PlaceThumb;
 import org.soma.tripper.place.repository.PlaceRepository;
@@ -42,8 +43,8 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public Page<Place> getPlaceByVersion(Pageable pageable,int version) {
-        return placeRepository.getPlaceByType(pageable,version);
+    public List<Object[]> getPlaceByVersion(int version, double averageLA, double averageLO, Pageable pageable) {
+        return placeRepository.getPlaceByTypeaAndLongtitudeAndLatitude(version,averageLA,averageLO,pageable);
     }
 
     @Override

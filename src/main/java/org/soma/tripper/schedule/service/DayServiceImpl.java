@@ -18,5 +18,8 @@ public class DayServiceImpl implements DayService{
         return dayRepository.findDayByDaynum(num);
     }
 
-
+    @Override
+    public Optional<Day> findDaybySeqnumAndDay(int seqnum, int day) {
+        return dayRepository.findDayBySeqnumAndDay(seqnum,day);
+    }
 }

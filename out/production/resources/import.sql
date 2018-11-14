@@ -5,7 +5,7 @@
  insert into user(user_num,device_token,email,name,password,sex,url) values (4,"test2","user3","user3","string",0,'https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/default.png');
 
 -- seq
- INSERT INTO `book_ex`.`seq` (`seqnum`,`title`, `usernum`) VALUES (1,'test', '1');
+ INSERT INTO `book_ex`.`seq` (`seqnum`,`title`, `usernum`) VALUES (1,'TestPlace', '1');
  INSERT INTO `book_ex`.`seq` (`seqnum`,`title`, `usernum`) VALUES (2,'test2', '2');
  INSERT INTO `book_ex`.`seq` (`seqnum`,`title`, `usernum`) VALUES (3,'test3', '3');
  INSERT INTO `book_ex`.`seq` (`seqnum`,`title`, `usernum`) VALUES (4,'test4', '4');
@@ -27,8 +27,8 @@
  INSERT INTO `book_ex`.`day` (`daynum`,`day`, `seqnum`) VALUES (10,'1', '4');
  INSERT INTO `book_ex`.`day` (`daynum`,`day`, `seqnum`) VALUES (11,'2', '4');
 
- INSERT INTO `book_ex`.`day` (`daynum`,`day`, `seqnum`) VALUES (12,'1', '1');
- INSERT INTO `book_ex`.`day` (`daynum`,`day`, `seqnum`) VALUES (13,'2', '1');
+ INSERT INTO `book_ex`.`day` (`daynum`,`day`, `seqnum`) VALUES (12,'1', '5');
+ INSERT INTO `book_ex`.`day` (`daynum`,`day`, `seqnum`) VALUES (13,'2', '5');
 
 -- schedule
  INSERT INTO `book_ex`.`schedule` (`schedulenum`,`daynum`, `placenum`) VALUES (1,'1', '1');
