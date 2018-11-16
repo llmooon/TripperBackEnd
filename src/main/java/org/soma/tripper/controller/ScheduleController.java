@@ -83,15 +83,15 @@ public class ScheduleController {
 
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
     @PostMapping("/inputPurpose")
-    public ResponseEntity<SeqDTO> inputPurpose(@RequestBody PurposeDTO purposeDTO) throws Exception{
+    public ResponseEntity<SeqDTO> inputPurpose(@RequestBody PurposeDTO purposeDTO) {
         User user = userService.findUserByEmail(purposeDTO.getUser()).orElseThrow(()->new NoSuchDataException("회원 정보가 없습니다."));
 
         MLDTO mldto = MLDTO.builder()
                 .purposeDTO(purposeDTO)
                 .user(user)
                 .build();
-
-        List<Day> dayList = sendML(mldto);
+        try {
+            List<Day> dayList = sendML(mldto);
         Seq seq = Seq.builder()
                 .dayList(dayList)
                 .user(user)
@@ -99,7 +99,7 @@ public class ScheduleController {
                 .totalday(purposeDTO.getDays())
                 .build();
         Seq result = seqService.insertSeq(seq);
-        //didn't TestPlace!
+//        //didn't TestPlace!
         Review review= Review.builder()
                 .seqnum(result.getSeqnum())
                 .usernum(user.getUser_num())
@@ -111,7 +111,12 @@ public class ScheduleController {
             }
         }
         reviewService.uploadReview(review);
-        return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
+        return new ResponseEntity<>(result.toDTO(),HttpStatus.OK);
+        }
+        catch (Exception e){
+         logger.info("error");
+         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @ApiOperation(value = "menu - My Schedule (유저별 스케쥴 로드)")
@@ -124,6 +129,15 @@ public class ScheduleController {
             res.add(seq.toMyDTO());
         }
         return new ResponseEntity<>(res,HttpStatus.OK);
+    }
+
+    @ApiOperation(value="add/delete Schedule")
+    @PutMapping("addOrDelete")
+    public ResponseEntity<SeqDTO> add_deleteSchedule(@RequestBody SeqDTO seqDTO){
+        Seq seq = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("으잉으잉"));
+        seq.setSchedulelist(seqDTO.getDayList());
+        seqService.modifySeq(seq);
+        return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
     @ApiOperation(value="update Schedule", notes = "시간 없데이트는 나중에... 흑")

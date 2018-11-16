@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class UpdateScheduleDTO {
     private String username;
     private int seqnum;
-    //LocalDateTime startTime;
+    LocalDateTime startTime;
     private int day;
     private int beforePlacenum;
     private int newPlacenum;
