@@ -66,6 +66,7 @@ public class SearchController {
         for (Place p:result ) {
             results.add(
                 SimplePlaceDTO.builder()
+                    .placenum(p.getPlace_num())
                     .name(p.getName())
                     .location(p.getCity())
                     .thumb(p.getThumb().getBucket())

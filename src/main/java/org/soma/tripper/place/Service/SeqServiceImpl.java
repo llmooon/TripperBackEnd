@@ -34,8 +34,8 @@ public class SeqServiceImpl implements  SeqService{
     }
 
     @Override
-    public void deleteSeq(int seqnum) {
-        seqRepository.deleteById(seqnum);
+    public void deleteSeq(Seq seq) {
+        seqRepository.delete(seq);
     }
 
     @Override

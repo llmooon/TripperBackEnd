@@ -15,6 +15,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     ScheduleRepository scheduleRepository;
 
     @Override
+    public void deleteSchedule(Schedule schedule) {
+        scheduleRepository.delete(schedule);
+
+    }
+
+    @Override
     public List<Schedule> findAllSchedule() {
         return scheduleRepository.findAll();
     }

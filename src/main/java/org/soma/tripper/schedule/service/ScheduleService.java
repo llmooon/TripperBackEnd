@@ -11,4 +11,5 @@ public interface ScheduleService {
     void saveScheduleList(List<Schedule> scheduleList);
     void saveSchedule(Schedule schedule);
     Optional<Schedule> findScheduleById(int id);
+    void deleteSchedule(Schedule schedule);
 }

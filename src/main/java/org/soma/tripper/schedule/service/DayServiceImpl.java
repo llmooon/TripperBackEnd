@@ -22,4 +22,9 @@ public class DayServiceImpl implements DayService{
     public Optional<Day> findDaybySeqnumAndDay(int seqnum, int day) {
         return dayRepository.findDayBySeqnumAndDay(seqnum,day);
     }
+
+    @Override
+    public void deleteDay(Day day) {
+        dayRepository.delete(day);
+    }
 }

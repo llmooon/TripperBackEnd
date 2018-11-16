@@ -5,10 +5,7 @@ import lombok.*;
 import org.soma.tripper.place.entity.Place;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Getter
 @Entity
@@ -25,7 +22,7 @@ public class Schedule {
 
     LocalDateTime startTime;
 
-    @OneToOne//(cascade = CascadeType.MERGE)
+    @ManyToOne(targetEntity = Place.class,fetch = FetchType.EAGER)//(cascade = CascadeType.MERGE)
     @JoinColumn(name = "placenum")
     private Place place;
 

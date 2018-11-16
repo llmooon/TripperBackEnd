@@ -1,6 +1,5 @@
 package org.soma.tripper.controller;
 
-import com.amazonaws.services.dynamodbv2.xspec.NULL;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.json.simple.JSONArray;
@@ -12,30 +11,22 @@ import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.SeqService;
 import org.soma.tripper.place.dto.MLDTO;
-import org.soma.tripper.place.dto.PlaceWithDistance;
 import org.soma.tripper.place.dto.PurposeDTO;
 import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
-import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Review;
-import org.soma.tripper.review.entity.Thumb;
 import org.soma.tripper.review.service.ReviewService;
 import org.soma.tripper.review.service.ThumbService;
-import org.soma.tripper.schedule.dto.MyScheduleDTO;
-import org.soma.tripper.schedule.dto.RecomendedPlace;
-import org.soma.tripper.schedule.dto.ScheduleDTO;
-import org.soma.tripper.schedule.dto.UpdateScheduleDTO;
+import org.soma.tripper.schedule.dto.*;
 import org.soma.tripper.schedule.entity.Day;
 import org.soma.tripper.schedule.entity.Schedule;
-import org.soma.tripper.schedule.repository.DayRepository;
 import org.soma.tripper.schedule.service.DayService;
 import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.domain.User;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,9 +38,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/schedule")
@@ -120,9 +108,9 @@ public class ScheduleController {
     }
 
     @ApiOperation(value = "menu - My Schedule (유저별 스케쥴 로드)")
-    @GetMapping("load/{userid}")
-    public ResponseEntity<List<MyScheduleDTO>> loadSchedule(@PathVariable String userid){
-        User user = userService.findUserByEmail(userid).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
+    @GetMapping("load/{usernum}")
+    public ResponseEntity<List<MyScheduleDTO>> loadSchedule(@PathVariable Integer usernum){
+        User user = userService.findUserByUsernum(usernum).orElseThrow(()->new NoSuchDataException("잘못된 회원 정보"));
         List<Seq> seqList = seqService.loadSeqByUser(user).orElseThrow(()->new NoSuchDataException("빔"));
         List<MyScheduleDTO> res=new ArrayList<>();
         for (Seq seq:seqList ) {
@@ -131,13 +119,52 @@ public class ScheduleController {
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
 
-    @ApiOperation(value="add/delete Schedule")
+    @ApiOperation(value = "스케쥴 상세보기")
+    @GetMapping("loadSeq/{seqnum}")
+    public ResponseEntity<Seq> loadSeq(@PathVariable Integer seqnum){
+       Seq seq= seqService.loadSeq(seqnum).orElseThrow(()->new NoSuchDataException("빔"));
+        return new ResponseEntity<>(seq,HttpStatus.OK);
+    }
+
+    @ApiOperation(value="add/delete/modify Schedule ")
     @PutMapping("addOrDelete")
-    public ResponseEntity<SeqDTO> add_deleteSchedule(@RequestBody SeqDTO seqDTO){
-        Seq seq = seqService.loadSeq(seqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("으잉으잉"));
-        seq.setSchedulelist(seqDTO.getDayList());
-        seqService.modifySeq(seq);
-        return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
+    public ResponseEntity<SeqDTO> add_deleteSchedule(@RequestBody ModifySeqDTO modifySeqDTO){
+        Seq seq = seqService.loadSeq(modifySeqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("error"));
+        List<Day> dayList = new ArrayList<>();
+
+        for(int i=0;i<modifySeqDTO.getDayList().size();i++){
+            Day entityDay = seq.getDayList().get(i);
+            //dayService.deleteDay(entityDay);
+            List<Schedule> scheduleList = new ArrayList<>();
+            for(ModifyScheduleDTO schedule :modifySeqDTO.getDayList().get(i).getSchedulelist()){
+                Place place = placeService.findPlaceByNum(schedule.getPlace_num()).get();
+                Schedule updateSchedule = Schedule.builder()
+                        .daynum(entityDay.getDaynum())
+                        .place(place)
+                        .startTime(schedule.getStartTime())
+                        .build();
+                scheduleList.add(updateSchedule);
+            }
+            dayList.add(Day.builder().day(i+1).schedulelist(scheduleList).build());
+        }
+        int daysize = seq.getDayList().size();
+        for(int j=0;j<daysize;j++){
+            Day d=seq.getDayList().get(0);
+            int size = d.getSchedulelist().size();
+            for(int i=0;i<size;i++) {
+                Schedule s=d.getSchedulelist().get(0);
+                d.removeChild(s);
+                scheduleService.deleteSchedule(s);
+            }
+            seq.removeDay(d);
+            dayService.deleteDay(d);
+        }
+        seq.getDayList().clear();
+        seq.setSchedulelist(dayList);
+        logger.info("delete!!!!");
+        seqService.insertSeq(seq);
+      //seqService.deleteSeq(seq);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation(value="update Schedule", notes = "시간 없데이트는 나중에... 흑")
@@ -149,11 +176,9 @@ public class ScheduleController {
         for (Schedule s:scheduleList) {
             if(s.getPlace().getPlace_num()==updateScheduleDTO.getBeforePlacenum()){
                 s.setPlace(newplace);
-               // s.setStartTime(updateScheduleDTO.getStartTime());
                 break;
             }
         }
-        // later ml send!
        seqService.modifySeq(seq);
         return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }

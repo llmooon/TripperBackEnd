@@ -12,6 +12,6 @@ public interface SeqService {
     Seq insertSeq(Seq seq);
     Seq modifySeq(Seq seq);
     Optional<Seq> loadSeq(int seqnum);
-    void deleteSeq(int seqnum);
+    void deleteSeq(Seq seq);
     Optional<List<Seq>> loadSeqByUser(User user);
 }

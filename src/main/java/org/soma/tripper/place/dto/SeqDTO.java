@@ -1,12 +1,7 @@
 package org.soma.tripper.place.dto;
 
 import lombok.*;
-import org.soma.tripper.common.exception.NoSuchDataException;
-import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.schedule.entity.Day;
-import org.soma.tripper.schedule.entity.Schedule;
-import org.soma.tripper.user.domain.User;
-import org.soma.tripper.user.repository.UserRepository;
 
 import java.sql.Date;
 import java.util.List;

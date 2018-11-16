@@ -35,10 +35,14 @@ public class Seq {
     @JoinColumn(name="usernum")
     private User user;
 
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "seqnum")
+    @OrderBy("daynum asc")
     private List<Day> dayList;
 
+    public void removeDay(Day day){
+        this.dayList.remove(day);
+    }
 
     @Builder
     public Seq(int seqnum,User user,List<Day> dayList,Date fromdate,String region, Date toDate,int totalday){
@@ -52,7 +56,9 @@ public class Seq {
     }
 
     public void setSchedulelist(List<Day> dayList) {
-        this.dayList = dayList;
+        this.dayList.clear();
+        this.dayList.addAll(dayList);
+
     }
 
     public SeqDTO toDTO(){
