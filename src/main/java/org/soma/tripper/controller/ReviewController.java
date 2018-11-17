@@ -7,6 +7,7 @@ import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.SeqService;
 import org.soma.tripper.place.entity.Seq;
+import org.soma.tripper.place.repository.SeqRepository;
 import org.soma.tripper.review.dto.*;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Photo;
@@ -17,7 +18,6 @@ import org.soma.tripper.review.service.AmazonClient;
 import org.soma.tripper.review.service.DetailsService;
 import org.soma.tripper.review.service.PhotoService;
 import org.soma.tripper.review.service.ReviewService;
-import org.soma.tripper.schedule.entity.Schedule;
 import org.soma.tripper.schedule.service.DayService;
 import org.soma.tripper.schedule.service.ScheduleService;
 import org.soma.tripper.user.service.UserService;
@@ -69,6 +69,9 @@ public class ReviewController {
     private AmazonClient amazonClient;
 
     @Autowired
+    SeqRepository seqRepository;
+
+    @Autowired
     ReviewController(AmazonClient amazonClient){
         this.amazonClient=amazonClient;
     }
@@ -76,26 +79,42 @@ public class ReviewController {
     String s3Url = "https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/";
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @ApiOperation(value="review - write_review (리뷰 작성 로딩 화면) ")
-    @PostMapping(value = "/getUploadView/{reviewnum}")
-    public ResponseEntity<ReviewDTO> getuploadReviewView(@PathVariable int reviewnum){
-        Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 리뷰 번호"));
-        ReviewDTO res = review.toReviewDTO();
-        return new ResponseEntity<>(res,HttpStatus.OK);
-    }
+//    @ApiOperation(value="review - write_review (리뷰 작성 로딩 화면) ")
+//    @PostMapping(value = "/getUploadView/{reviewnum}")
+//    public ResponseEntity<ReviewDTO> getuploadReviewView(@PathVariable int reviewnum){
+//        Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 리뷰 번호"));
+//        ReviewDTO res = review.toReviewDTO();
+//        return new ResponseEntity<>(res,HttpStatus.OK);
+//    }
 
     @ApiOperation(value="review - write_review (리뷰 콘텐츠 작성) ")
     @PostMapping(value = "/uploadContent")
     public ResponseEntity<ReviewDTO> uploadReview(@RequestBody ReviewDTO reviewDTO){
         Review review = reviewService.loadReviewById(reviewDTO.getReviewnum()).orElseThrow(()->new NoSuchDataException("잘못된 리뷰 번호"));
-        for(int i=0;i<review.getDetails().size();i++){
-            review.getDetails().get(i).setContent(reviewDTO.getReviews().get(i).getContent());
+        for(DetailDTO d:reviewDTO.getReviews()){
+            Details details = detailsService.loadDetailsByDetailsnum(d.getDetailsnum()).orElseThrow(()->new NoSuchDataException());
+            details.setContent(d.getContent());
         }
+        review.setIsvalid(1);
         ReviewDTO res = reviewService.uploadReview(review).toReviewDTO();
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
 
-    @ApiOperation(value="review - write_review (리뷰 사진 업로드) ")
+    @ApiOperation(value="review - delete_review (리뷰 콘텐츠 삭제) ")
+    @PostMapping(value = "/deleteReview/{reviewnum}/{detailsnum}")
+    public ResponseEntity<ReviewByDayDTO> deleteReview(@PathVariable int reviewnum,@PathVariable int detailsnum){
+        Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 리뷰 번호"));
+        Details details = detailsService.loadDetailsByDetailsnum(detailsnum).orElseThrow(()->new NoSuchDataException(""));
+        details.setContent("");
+        int photoSize = details.getPhotos().size();
+        for(int i=0;i<photoSize;i++) {
+            details.removePhoto(details.getPhotos().get(0));
+        }
+        return LoadReviewByreviewnum(reviewnum);
+    }
+
+
+    @ApiOperation(value="review - write/Modify_review (리뷰 사진 업로드/수정) ")
     @PostMapping(value = "/uploadPhoto")
     public ResponseEntity<String> uploadPhoto(@RequestParam int detailsnum, @RequestParam MultipartFile file){
         Details details = detailsService.loadDetailsByDetailsnum(detailsnum).orElseThrow(()->new NoSuchDataException("잘못된 detailsnum"));
@@ -122,30 +141,25 @@ public class ReviewController {
         return new ResponseEntity<>(imgUrl,HttpStatus.OK);
     }
 
-//    @GetMapping("/userload/{userEmail}")
-//    public ResponseEntity<List<Review>> userLoad(@PathVariable String userEmail){
-//        int userNum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
-//        List<Review> reviews = reviewService.loadReviewByUser(userNum).orElseThrow(()->new NoSuchDataException("작성된 리뷰가 없습니다."));
-//        return new ResponseEntity<>(reviews,HttpStatus.OK);
-//    }
     @ApiOperation(value="review - Detail_review (리뷰 로드)")
     @GetMapping("/load/{reviewnum}")
     public ResponseEntity<ReviewByDayDTO> LoadReviewByreviewnum(@PathVariable int reviewnum){
         Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 reviewnum"));
         review.setView(review.getView()+1);
         reviewService.uploadReview(review);
+        List<Seq> seqList = seqRepository.findAll();
         Seq seq = seqService.loadSeq(review.getSeqnum()).orElseThrow(()->new NoSuchDataException("잘못된 seqnum"));
 
         List<DetailDTO> detail = review.toDetailDTO();
         List<DayDTO> dayDTOS = new ArrayList<>();
         List<ReadDetailDTO> readDetailDTOS = new ArrayList<>();
 
-        for(int i=0;i<seq.getTotalday()-1;i++) dayDTOS.add(DayDTO.builder().day(i+1).build()); //set Day size
+        for(int i=0;i<seq.getTotalday();i++) dayDTOS.add(DayDTO.builder().day(i+1).build()); //set Day size
 
         for (DetailDTO d: detail) {
-            Schedule schedule =scheduleService.findScheduleById(d.getDetailsnum()).orElseThrow(()-> new NoSuchDataException("error schedule num"));
-            int day = dayService.findDaybyDaynum(schedule.getDaynum()).get().getDay();
-            ReadDetailDTO rd =ReadDetailDTO.builder().content(d.getContent()).photos(d.getPhotos()).schedule(schedule).build();
+            //Schedule schedule =scheduleService.findScheduleById(d.g).orElseThrow(()-> new NoSuchDataException("error schedule num"));//
+            int day = dayService.findDaybyDaynum(d.getSchedule().getDaynum()).get().getDay();
+            ReadDetailDTO rd =ReadDetailDTO.builder().content(d.getContent()).detailsnum(d.getDetailsnum()).photos(d.getPhotos()).schedule(d.getSchedule()).build();
             dayDTOS.get(day-1).addDetails(rd);
         }
 
@@ -207,5 +221,6 @@ public class ReviewController {
                 .title(seqService.loadSeq(r.getSeqnum()).get().getTitle())
                 .build();
     }
+
 
 }

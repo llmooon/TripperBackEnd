@@ -14,7 +14,7 @@
 
     public interface ReviewRepository extends JpaRepository<Review,Integer> {
 
-        Page<Review> findReviewsByIsvalid(int isvalid, Pageable pageRequest);
+        Page<Review> findReviewsByIsvalid(Pageable pageRequest,int isvalid);
 
         Optional<Review> findReviewByReviewnum(int reviewnum);
 

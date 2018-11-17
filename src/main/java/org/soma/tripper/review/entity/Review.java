@@ -1,6 +1,7 @@
 package org.soma.tripper.review.entity;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.soma.tripper.common.BaseTimeEntity;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.review.dto.DetailDTO;
@@ -28,7 +29,11 @@ public class Review extends BaseTimeEntity {
     private int view;
     private int isvalid;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    public void setIsvalid(int isvalid) {
+        this.isvalid = isvalid;
+    }
+
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name="thumbnum")
     private Thumb thumb;
 
@@ -37,14 +42,19 @@ public class Review extends BaseTimeEntity {
         this.thumb = thumb;
     }
 
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "reviewnum")
+    @OrderBy("detailsnum")
     private List<Details> details;
 
     public void setDetails(List<Details> details) {
-        this.details = details;
+        this.details.clear();
+        this.details.addAll(details);
     }
 
+    public void removeDetails(Details d){
+        details.remove(d);
+    }
     public void adddetails(Details detail){
         if(details==null) details=new ArrayList<>();
         details.add(detail);
@@ -56,7 +66,7 @@ public class Review extends BaseTimeEntity {
                 .reviewnum(this.reviewnum)
                 .reviews(detailDTOS)
                 .seqnum(this.seqnum)
-                .thumb(this.thumb)
+               // .thumb(this.thumb)
                 .build();
     }
 
@@ -70,6 +80,7 @@ public class Review extends BaseTimeEntity {
             detailDTOS.add(
                     DetailDTO.builder()
                     .content(d.getContent())
+                    .schedule(d.getSchedule())
                     .photos(photos)
                     .detailsnum(d.getDetailsnum())
                     .build());

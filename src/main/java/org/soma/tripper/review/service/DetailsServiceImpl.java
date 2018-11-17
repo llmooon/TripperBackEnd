@@ -36,4 +36,9 @@ public class DetailsServiceImpl implements DetailsService{
     public Optional<Details> loadDetailsByDetailsnum(int id) {
         return detailsRepository.findByDetailsnum(id);
     }
+
+    @Override
+    public void delete(Details details) {
+        detailsRepository.delete(details);
+    }
 }

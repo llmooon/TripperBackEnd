@@ -12,14 +12,15 @@ import java.util.List;
 public class ReviewDTO {
     private int reviewnum;
     private int seqnum;
+
     private List<DetailDTO> reviews;
-    private Thumb thumb;
+    //private Thumb thumb;
 
     @Builder
-    public ReviewDTO(int reviewnum, int seqnum, List<DetailDTO> reviews, Thumb thumb) {
+    public ReviewDTO(int reviewnum, int seqnum, List<DetailDTO> reviews) {
         this.reviewnum = reviewnum;
         this.seqnum = seqnum;
         this.reviews = reviews;
-        this.thumb = thumb;
+        //this.thumb = thumb;
     }
 }

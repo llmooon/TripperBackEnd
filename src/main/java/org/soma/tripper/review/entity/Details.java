@@ -22,9 +22,19 @@ public class Details {
     private String content;
     private int reviewnum;
 
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "detailsnum")
     private List<Photo> photos;
+
+    public void setPhoto(List<Photo> photoList){
+        this.photos.clear();
+        this.photos.addAll(photoList);
+    }
+
+    public void removePhoto(Photo photo){
+        photos.remove(photo);
+    }
+
 
     public void addPhoto(Photo p){
         if(photos==null) photos=new ArrayList<>();

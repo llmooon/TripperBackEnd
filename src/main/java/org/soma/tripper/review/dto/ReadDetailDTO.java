@@ -12,13 +12,15 @@ import java.util.List;
 @ToString
 public class ReadDetailDTO {
 
+    private int detailsnum;
     private Schedule schedule;
     private String content;
     private List<String> photos;
 
     @Builder
-    ReadDetailDTO(Schedule schedule, String content, List<String> photos){
+    ReadDetailDTO(Schedule schedule, int detailsnum,String content, List<String> photos){
         this.schedule=schedule;
+        this.detailsnum=detailsnum;
         this.content=content;
         this.photos=photos;
     }

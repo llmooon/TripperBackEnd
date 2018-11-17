@@ -16,7 +16,10 @@ import org.soma.tripper.place.dto.SeqDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.review.entity.Details;
+import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
+import org.soma.tripper.review.service.DetailsService;
+import org.soma.tripper.review.service.PhotoService;
 import org.soma.tripper.review.service.ReviewService;
 import org.soma.tripper.review.service.ThumbService;
 import org.soma.tripper.schedule.dto.*;
@@ -68,6 +71,12 @@ public class ScheduleController {
     @Autowired
     ThumbService thumbService;
 
+    @Autowired
+    PhotoService photoService;
+
+    @Autowired
+    DetailsService detailsService;
+
 
     @ApiOperation(value="input purpose for Trip",notes = "여행지를 리턴해줍니다. 일단 목적 요소들은 Int 형으로 입력, db는 완료 누른후.")
     @PostMapping("/inputPurpose")
@@ -88,17 +97,7 @@ public class ScheduleController {
                 .build();
         Seq result = seqService.insertSeq(seq);
 //        //didn't TestPlace!
-        Review review= Review.builder()
-                .seqnum(result.getSeqnum())
-                .usernum(user.getUser_num())
-                .isvalid(0)
-                .build();
-        for (Day d:dayList) {
-            for(Schedule s:d.getSchedulelist()){
-                review.adddetails(Details.builder().schedule(s).build());
-            }
-        }
-        reviewService.uploadReview(review);
+        initReview(seq,user);
         return new ResponseEntity<>(result.toDTO(),HttpStatus.OK);
         }
         catch (Exception e){
@@ -126,15 +125,18 @@ public class ScheduleController {
         return new ResponseEntity<>(seq,HttpStatus.OK);
     }
 
+    //initReview
     @ApiOperation(value="add/delete/modify Schedule ")
     @PutMapping("addOrDelete")
     public ResponseEntity<SeqDTO> add_deleteSchedule(@RequestBody ModifySeqDTO modifySeqDTO){
         Seq seq = seqService.loadSeq(modifySeqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("error"));
-        List<Day> dayList = new ArrayList<>();
+        Review review = reviewService.loadReviewByUserAndSeq(seq.getUser().getUser_num(),seq.getSeqnum()).orElseThrow(()->new NoSuchDataException());
+        deleteReview(review);
 
+        List<Day> dayList = new ArrayList<>();
+        List<Details> detailsList = new ArrayList<>();
         for(int i=0;i<modifySeqDTO.getDayList().size();i++){
             Day entityDay = seq.getDayList().get(i);
-            //dayService.deleteDay(entityDay);
             List<Schedule> scheduleList = new ArrayList<>();
             for(ModifyScheduleDTO schedule :modifySeqDTO.getDayList().get(i).getSchedulelist()){
                 Place place = placeService.findPlaceByNum(schedule.getPlace_num()).get();
@@ -161,9 +163,18 @@ public class ScheduleController {
         }
         seq.getDayList().clear();
         seq.setSchedulelist(dayList);
-        logger.info("delete!!!!");
         seqService.insertSeq(seq);
-      //seqService.deleteSeq(seq);
+        for(Day d:seq.getDayList()){
+            for(Schedule s:d.getSchedulelist()){
+                detailsList.add(Details.builder().schedule(s).build());
+            }
+        }
+
+        review.getDetails().clear();
+        review.setDetails(detailsList);
+        reviewService.uploadReview(review);
+
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -241,7 +252,7 @@ public class ScheduleController {
                 ZonedDateTime tmptime=ZonedDateTime.parse((String)tmp.get("recommend_time"));
                 LocalDateTime date1=tmptime.toLocalDateTime();
                 int place_num= ((Long)tmp.get("trip_id")).intValue();
-                Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong ML place_nium"));
+                Place place=placeService.findPlaceByNum(place_num).orElseThrow(()->new NoSuchDataException("wrong ML place_num"));
 
                 Schedule schedule = Schedule.builder()
                         .daynum(i+1)
@@ -256,5 +267,35 @@ public class ScheduleController {
             dayList.add(day);
         }
         return dayList;
+    }
+
+    public void initReview(Seq seq,User user){
+        Review review= Review.builder()
+                .seqnum(seq.getSeqnum())
+                .usernum(user.getUser_num())
+                .isvalid(0)
+                .build();
+        for (Day d:seq.getDayList()) {
+            for(Schedule s:d.getSchedulelist()){
+                review.adddetails(Details.builder().schedule(s).build());
+            }
+        }
+        reviewService.uploadReview(review);
+    }
+
+    public void deleteReview(Review review){
+        int dsize = review.getDetails().size();
+
+        for(int  i=0;i<dsize;i++){
+            Details d = review.getDetails().get(0);
+            int photosize = d.getPhotos().size();
+            for(int j=0;j<photosize;j++){
+                Photo p = d.getPhotos().get(0);
+                d.removePhoto(p);
+                photoService.delete(p);
+            }
+            review.removeDetails(d);
+            detailsService.delete(d);
+        }
     }
 }
