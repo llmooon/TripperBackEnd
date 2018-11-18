@@ -15,14 +15,16 @@ public class MyScheduleDTO {
     private Date toDate;
     private String title;
     private String region;
+    private int reviewnum;
 
 
     @Builder
-    public MyScheduleDTO(int seqnum,Date fromdate,String title,Date toDate,String region){
+    public MyScheduleDTO(int seqnum,Date fromdate,String title,Date toDate,String region,int reviewnum){
         this.seqnum=seqnum;
         this.fromdate=fromdate;
         this.title=title;
         this.toDate=toDate;
         this.region=region;
+        this.reviewnum=reviewnum;
     }
 }

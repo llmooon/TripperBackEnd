@@ -113,7 +113,8 @@ public class ScheduleController {
         List<Seq> seqList = seqService.loadSeqByUser(user).orElseThrow(()->new NoSuchDataException("빔"));
         List<MyScheduleDTO> res=new ArrayList<>();
         for (Seq seq:seqList ) {
-            res.add(seq.toMyDTO());
+            Review review = reviewService.loadReviewByUserAndSeq(user.getUser_num(),seq.getSeqnum()).orElseThrow(()->new NoSuchDataException());
+            res.add(seq.toMyDTO(review.getReviewnum()));
         }
         return new ResponseEntity<>(res,HttpStatus.OK);
     }

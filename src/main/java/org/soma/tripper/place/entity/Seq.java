@@ -71,11 +71,12 @@ public class Seq {
                 .dayList(this.getDayList())
                 .build();
     }
-    public MyScheduleDTO toMyDTO(){
+    public MyScheduleDTO toMyDTO(int reviewnum){
         return MyScheduleDTO.builder()
                 .fromdate(fromdate)
                 .title(title)
                 .toDate(toDate)
+                .reviewnum(reviewnum)
                 .seqnum(seqnum)
                 .region(region)
                 .build();
