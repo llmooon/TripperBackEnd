@@ -41,6 +41,9 @@ public class Details {
         photos.add(p);
     }
 
+    public void deleteContent(){
+        this.content=null;
+    }
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="schedulenum")
     private Schedule schedule;

@@ -105,10 +105,19 @@ public class ReviewController {
     public ResponseEntity<ReviewByDayDTO> deleteReview(@PathVariable int reviewnum,@PathVariable int detailsnum){
         Review review = reviewService.loadReviewById(reviewnum).orElseThrow(()->new NoSuchDataException("잘못된 리뷰 번호"));
         Details details = detailsService.loadDetailsByDetailsnum(detailsnum).orElseThrow(()->new NoSuchDataException(""));
-        details.setContent("");
+        details.deleteContent();
         int photoSize = details.getPhotos().size();
         for(int i=0;i<photoSize;i++) {
             details.removePhoto(details.getPhotos().get(0));
+        }
+        int isvalid=0;
+        for(Details d:review.getDetails()){
+            if(d.getContent()!=null && d.getContent()!="" && d.getPhotos().size()!=0) isvalid=1;
+        }
+        if(isvalid==0){
+            review.setIsvalid(0);
+            reviewService.uploadReview(review);
+            logger.info("delete!");
         }
         return LoadReviewByreviewnum(reviewnum);
     }
@@ -157,7 +166,6 @@ public class ReviewController {
         for(int i=0;i<seq.getTotalday();i++) dayDTOS.add(DayDTO.builder().day(i+1).build()); //set Day size
 
         for (DetailDTO d: detail) {
-            //Schedule schedule =scheduleService.findScheduleById(d.g).orElseThrow(()-> new NoSuchDataException("error schedule num"));//
             int day = dayService.findDaybyDaynum(d.getSchedule().getDaynum()).get().getDay();
             ReadDetailDTO rd =ReadDetailDTO.builder().content(d.getContent()).detailsnum(d.getDetailsnum()).photos(d.getPhotos()).schedule(d.getSchedule()).build();
             dayDTOS.get(day-1).addDetails(rd);
