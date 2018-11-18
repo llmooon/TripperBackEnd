@@ -206,7 +206,7 @@ public class ScheduleController {
 
     @GetMapping("/SearchingByCategory/{version}/{seqnum}/{daynum}/{page}")
     @ApiOperation(value="version 값에 따른 카테고리별 장소 반환/ 관광지 :1 //맛집 :2 // 스포츠 :3 // 쇼핑 :4 // 숙박:5 // 공원 :6 // 야경 :7  ")
-    public ResponseEntity<List<RecomendedPlace>> searchingByCategory(@PathVariable Integer version, @PathVariable Integer seqnum, @PathVariable Integer daynum, @PathVariable Integer page){
+    public ResponseEntity<List<BasicPlaceDTO>> searchingByCategory(@PathVariable Integer version, @PathVariable Integer seqnum, @PathVariable Integer daynum, @PathVariable Integer page){
         List<Schedule> scheduleList = dayService.findDaybySeqnumAndDay(seqnum,daynum).get().getSchedulelist();
 
         //스케쥴 일정의 평균 위도, 경도를 중심으로 카테고리별 장소 추천
@@ -221,13 +221,13 @@ public class ScheduleController {
         PageRequest request;
         request= PageRequest.of(page,20);
         List<Object[]> placeList = placeService.getPlaceByVersion(version,AverageLA,AverageLO,request);
-        List<RecomendedPlace> recomendedPlaces = new ArrayList<>();
+        List<BasicPlaceDTO> basicPlaceDTOS = new ArrayList<>();
         for(Object[] p : placeList){
             String img = thumbService.findThumbByNum((Integer) p[10]).get().getBucket();
-            RecomendedPlace recomendedPlace = RecomendedPlace.builder().placenum((Integer) p[0]).city((String)p[1]).name((String)p[6]).picture(img).build();
-            recomendedPlaces.add(recomendedPlace);
+            BasicPlaceDTO basicPlaceDTO = BasicPlaceDTO.builder().placenum((Integer) p[0]).city((String)p[1]).name((String)p[6]).picture(img).build();
+            basicPlaceDTOS.add(basicPlaceDTO);
         }
-        return new ResponseEntity<>(recomendedPlaces,HttpStatus.OK);
+        return new ResponseEntity<>(basicPlaceDTOS,HttpStatus.OK);
     }
 
     private List<Day> sendML(MLDTO mldto) throws Exception{

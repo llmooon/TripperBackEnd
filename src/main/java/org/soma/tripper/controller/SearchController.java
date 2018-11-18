@@ -1,29 +1,28 @@
 package org.soma.tripper.controller;
 
-import com.amazonaws.services.xray.model.Http;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.Service.PlaceService;
 import org.soma.tripper.place.Service.SearchService;
 import org.soma.tripper.place.Service.SeqService;
-import org.soma.tripper.place.dto.SimplePlaceDTO;
 import org.soma.tripper.place.entity.Place;
 import org.soma.tripper.place.entity.Search;
 import org.soma.tripper.review.dto.MainReviewDTO;
 import org.soma.tripper.review.entity.Review;
 import org.soma.tripper.review.service.ReviewService;
+import org.soma.tripper.schedule.dto.BasicPlaceDTO;
 import org.soma.tripper.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import sun.applet.Main;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,19 +56,19 @@ public class SearchController {
 
     @GetMapping(value="/place/{place}/{page}")
     @ApiOperation(value="search place", notes="장소 이름 입력/ 페이지 입력")
-    public ResponseEntity<List<SimplePlaceDTO>> searchPlace(@PathVariable String place, @PathVariable int page){
+    public ResponseEntity<List<BasicPlaceDTO>> searchPlace(@PathVariable String place, @PathVariable int page){
         int size = 20;
         PageRequest request;
         request=PageRequest.of(page, size);
         Page<Place> result = placeService.findPlaceByName(request,place);
-        List<SimplePlaceDTO> results=new ArrayList<>();
+        List<BasicPlaceDTO> results=new ArrayList<>();
         for (Place p:result ) {
             results.add(
-                SimplePlaceDTO.builder()
+                    BasicPlaceDTO.builder()
                     .placenum(p.getPlace_num())
                     .name(p.getName())
-                    .location(p.getCity())
-                    .thumb(p.getThumb().getBucket())
+                    .city(p.getCity())
+                    .picture(p.getThumb().getBucket())
                     .build()
             );
         }
