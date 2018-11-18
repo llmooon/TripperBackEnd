@@ -120,9 +120,9 @@ public class ScheduleController {
 
     @ApiOperation(value = "스케쥴 상세보기")
     @GetMapping("loadSeq/{seqnum}")
-    public ResponseEntity<Seq> loadSeq(@PathVariable Integer seqnum){
+    public ResponseEntity<SeqDTO> loadSeq(@PathVariable Integer seqnum){
        Seq seq= seqService.loadSeq(seqnum).orElseThrow(()->new NoSuchDataException("빔"));
-        return new ResponseEntity<>(seq,HttpStatus.OK);
+        return new ResponseEntity<>(seq.toDTO(),HttpStatus.OK);
     }
 
     //initReview
