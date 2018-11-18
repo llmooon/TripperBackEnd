@@ -17,4 +17,5 @@ public interface PlaceService {
     void updatePlace(Place place);
     void updatePlaceList(List<Place> places);
     List<Place> findPlaceByThumb(PlaceThumb placeThumb);
+    Page<Place> getHotel(int version, Pageable pageable);
 }

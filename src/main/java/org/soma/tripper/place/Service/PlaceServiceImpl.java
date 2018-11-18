@@ -51,4 +51,9 @@ public class PlaceServiceImpl implements PlaceService {
     public List<Place> findPlaceByThumb(PlaceThumb placeThumb) {
         return placeRepository.getPlaceByThumb(placeThumb);
     }
+
+    @Override
+    public Page<Place> getHotel(int version, Pageable pageable) {
+        return placeRepository.getPlaceByType(version,pageable);
+    }
 }

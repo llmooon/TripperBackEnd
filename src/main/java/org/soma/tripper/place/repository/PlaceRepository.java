@@ -38,4 +38,6 @@ public interface PlaceRepository extends JpaRepository<Place,Integer> {
 
     List<Place> getPlaceByThumb(PlaceThumb thumb);
 
+    Page<Place> getPlaceByType(int version, Pageable pageable);
+
 }
