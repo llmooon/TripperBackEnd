@@ -14,7 +14,7 @@ public interface ReviewService {
     Optional<Review> loadReviewByUserAndSeq(int usernum, int seqnum);
     Optional<Review> loadReviewById(int num);//all
     Page<Review> loadReviewByStr(String str,Pageable pageable);
-
+    void delete(Review review);
 }
 
 

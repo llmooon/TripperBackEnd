@@ -45,6 +45,11 @@ public class ReviewServiceImpl implements ReviewService {
     public Page<Review> loadReviewByStr(String str,Pageable pageable) {
         return reviewRepository.findReviewBystr(str,pageable);
     }
+
+    @Override
+    public void delete(Review review) {
+        reviewRepository.delete(review);
+    }
 }
 
 

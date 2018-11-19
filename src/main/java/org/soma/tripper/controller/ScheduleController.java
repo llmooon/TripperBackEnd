@@ -176,7 +176,6 @@ public class ScheduleController {
         review.setDetails(detailsList);
         reviewService.uploadReview(review);
 
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -235,8 +234,30 @@ public class ScheduleController {
         return new ResponseEntity<>(basicPlaceDTOS,HttpStatus.OK);
     }
 
-    @PostMapping("/Delete/{schedulenum}")
-    public ResponseEntity deleteSchedule(@PathVariable Integer schedulenum){
+    @PostMapping("/Delete/{seqnum}")
+    public ResponseEntity deleteSchedule(@PathVariable Integer seqnum){
+
+        Seq seq = seqService.loadSeq(seqnum).orElseThrow(()->new NoSuchDataException("error"));
+        Review review = reviewService.loadReviewByUserAndSeq(seq.getUser().getUser_num(),seq.getSeqnum()).orElseThrow(()->new NoSuchDataException());
+        deleteReview(review);
+
+        int daysize = seq.getDayList().size();
+        for(int j=0;j<daysize;j++){
+            Day d=seq.getDayList().get(0);
+            int size = d.getSchedulelist().size();
+            for(int i=0;i<size;i++) {
+                Schedule s=d.getSchedulelist().get(0);
+                d.removeChild(s);
+                scheduleService.deleteSchedule(s);
+            }
+            seq.removeDay(d);
+            dayService.deleteDay(d);
+        }
+
+
+        review.getDetails().clear();
+        reviewService.delete(review);
+        seqService.deleteSeq(seq);
         return new ResponseEntity(HttpStatus.OK);
     }
 
