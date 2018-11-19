@@ -130,7 +130,7 @@ public class ScheduleController {
     //initReview
     @ApiOperation(value="add/delete/modify Schedule ")
     @PutMapping("addOrDelete")
-    public ResponseEntity<SeqDTO> add_deleteSchedule(@RequestBody ModifySeqDTO modifySeqDTO){
+    public ResponseEntity<SeqDTO> add_deleteSchedule(@RequestBody SeqDTO modifySeqDTO){
         Seq seq = seqService.loadSeq(modifySeqDTO.getSeqnum()).orElseThrow(()->new NoSuchDataException("error"));
         Review review = reviewService.loadReviewByUserAndSeq(seq.getUser().getUser_num(),seq.getSeqnum()).orElseThrow(()->new NoSuchDataException());
         deleteReview(review);
@@ -140,8 +140,8 @@ public class ScheduleController {
         for(int i=0;i<modifySeqDTO.getDayList().size();i++){
             //Day entityDay = seq.getDayList().get(i);
             List<Schedule> scheduleList = new ArrayList<>();
-            for(ModifyScheduleDTO schedule :modifySeqDTO.getDayList().get(i).getSchedulelist()){
-                Place place = placeService.findPlaceByNum(schedule.getPlace_num()).get();
+            for(Schedule schedule :modifySeqDTO.getDayList().get(i).getSchedulelist()){
+                Place place = placeService.findPlaceByNum(schedule.getPlace().getPlace_num()).get();
                 Schedule updateSchedule = Schedule.builder()
                         //.daynum(entityDay.getDaynum())
                         .place(place)
