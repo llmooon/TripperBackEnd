@@ -225,9 +225,11 @@ public class ReviewController {
     }
 
     private MainReviewDTO ReviewToMainReviewDTO(Review r){
+        String url="";
+        if(r.getThumb()!=null) url = r.getThumb().getBucket();
         return MainReviewDTO.builder()
                 .reviewnum(r.getReviewnum())
-                .photo(r.getThumb().getBucket())
+                .photo(url)
                 .time(r.getCreatedDate())
                 .writer(userService.findUserByUsernum(r.getUsernum()).get().getEmail())
                 .title(seqService.loadSeq(r.getSeqnum()).get().getTitle())
