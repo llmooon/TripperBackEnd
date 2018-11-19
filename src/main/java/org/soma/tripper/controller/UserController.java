@@ -62,7 +62,7 @@ public class UserController {
 
         }
         catch (Exception e){
-
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         TempUser user = userDTO.toTempUserEntity();
         user.setValidateUrl(url);
