@@ -57,8 +57,13 @@ public class UserController {
         Map<String,Object> model = new HashMap();
         model.put("name","tripper.com");
         model.put("url",url);
-        emailService.sendMail(new Email("Tripper@tripper.com",userDTO.getEmail(),"tripper 가입을 축하 드립니다! ","hello",model));
+        try {
+            emailService.sendMail(new Email("Tripper@tripper.com", userDTO.getEmail(), "tripper 가입을 축하 드립니다! ", "hello", model));
 
+        }
+        catch (Exception e){
+
+        }
         TempUser user = userDTO.toTempUserEntity();
         user.setValidateUrl(url);
         tempUserService.registerTempUser(user);

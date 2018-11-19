@@ -138,12 +138,12 @@ public class ScheduleController {
         List<Day> dayList = new ArrayList<>();
         List<Details> detailsList = new ArrayList<>();
         for(int i=0;i<modifySeqDTO.getDayList().size();i++){
-            Day entityDay = seq.getDayList().get(i);
+            //Day entityDay = seq.getDayList().get(i);
             List<Schedule> scheduleList = new ArrayList<>();
             for(ModifyScheduleDTO schedule :modifySeqDTO.getDayList().get(i).getSchedulelist()){
                 Place place = placeService.findPlaceByNum(schedule.getPlace_num()).get();
                 Schedule updateSchedule = Schedule.builder()
-                        .daynum(entityDay.getDaynum())
+                        //.daynum(entityDay.getDaynum())
                         .place(place)
                         .startTime(schedule.getStartTime())
                         .build();
@@ -175,8 +175,8 @@ public class ScheduleController {
         review.getDetails().clear();
         review.setDetails(detailsList);
         reviewService.uploadReview(review);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        Seq nseq = seqService.loadSeq(modifySeqDTO.getSeqnum()).get();
+        return new ResponseEntity<>(nseq.toDTO(),HttpStatus.OK);
     }
 
     @ApiOperation(value="update Schedule", notes = "시간 없데이트는 나중에... 흑")
