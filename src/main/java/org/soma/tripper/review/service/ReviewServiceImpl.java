@@ -53,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Optional<Review> loadReviewBySeqnum(int seqnum) {
-        return reviewRepository.findReviewByReviewnum(seqnum);
+        return reviewRepository.findReviewBySeqnum(seqnum);
     }
 
 }

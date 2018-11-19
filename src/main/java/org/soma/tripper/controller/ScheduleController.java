@@ -302,6 +302,7 @@ public class ScheduleController {
     }
 
     public void initReview(Seq seq,User user){
+        Thumb thumb = thumbService.findThumbByNum(0).get();
         Review review= Review.builder()
                 .seqnum(seq.getSeqnum())
                 .usernum(user.getUser_num())
@@ -312,6 +313,7 @@ public class ScheduleController {
                 review.adddetails(Details.builder().schedule(s).build());
             }
         }
+        review.setThumb(thumb);
         reviewService.uploadReview(review);
     }
 
