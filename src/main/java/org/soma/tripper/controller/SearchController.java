@@ -60,7 +60,7 @@ public class SearchController {
         int size = 20;
         PageRequest request;
         request=PageRequest.of(page, size);
-        Page<Place> result = placeService.findPlaceByName(request,place);
+        List<Place> result = placeService.findPlaceByName(request,place).orElseThrow(()->new NoSuchDataException("서비스 준비중입니다."));
         List<BasicPlaceDTO> results=new ArrayList<>();
         for (Place p:result ) {
             results.add(

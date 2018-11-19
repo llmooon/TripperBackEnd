@@ -28,7 +28,7 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public Page<Place> findPlaceByName(Pageable pageable, String name) {
+    public Optional<List<Place>> findPlaceByName(Pageable pageable, String name) {
         return placeRepository.findByNameContains(pageable,name);
     }
 

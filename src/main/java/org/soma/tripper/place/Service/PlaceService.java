@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface PlaceService {
     List<Place> getAllPlace();
     Optional<Place>findPlaceByNum(int num);
-    Page<Place> findPlaceByName(Pageable pageable, String name);
+    Optional<List<Place>> findPlaceByName(Pageable pageable, String name);
     List<Object[]> getPlaceByVersion(int version, double averageLA, double averageLO, Pageable page);
     void updatePlace(Place place);
     void updatePlaceList(List<Place> places);

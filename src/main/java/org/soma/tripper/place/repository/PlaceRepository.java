@@ -10,10 +10,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place,Integer> {
     List<Place> findAll();
-    Page<Place> findByNameContains(Pageable page, String name);
+    Optional<List<Place>> findByNameContains(Pageable page, String name);
 
 //    @Query(value = "select p.*, " + //p.place_num, p.name, p.thumbnum, p.city
 //            " ( 6371 * acos( cos( radians(:averageLA) ) * cos( radians(p.latitude) ) * cos( radians( p.longtitude ) - radians(:averageLO) ) + sin( radians(:averageLA) ) * sin( radians( p.latitude ) ) ) ) AS distance" +

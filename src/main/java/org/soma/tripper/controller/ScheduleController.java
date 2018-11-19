@@ -49,7 +49,7 @@ import java.util.List;
 public class ScheduleController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String PYTHON_SERVER_URL="http://djangoenv-env.f8jvbshimw.ap-northeast-2.elasticbeanstalk.com/recommend/2/?";
+    private static final String PYTHON_SERVER_URL="http://mlserver-env.pscqzdq4bm.ap-northeast-2.elasticbeanstalk.com/recommend/2/?";
     @Autowired
     UserService userService;
 
