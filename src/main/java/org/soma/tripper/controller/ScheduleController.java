@@ -18,6 +18,7 @@ import org.soma.tripper.place.entity.Seq;
 import org.soma.tripper.review.entity.Details;
 import org.soma.tripper.review.entity.Photo;
 import org.soma.tripper.review.entity.Review;
+import org.soma.tripper.review.entity.Thumb;
 import org.soma.tripper.review.service.DetailsService;
 import org.soma.tripper.review.service.PhotoService;
 import org.soma.tripper.review.service.ReviewService;
@@ -223,11 +224,20 @@ public class ScheduleController {
         List<Object[]> placeList = placeService.getPlaceByVersion(version,AverageLA,AverageLO,request);
         List<BasicPlaceDTO> basicPlaceDTOS = new ArrayList<>();
         for(Object[] p : placeList){
-            String img = thumbService.findThumbByNum((Integer) p[10]).get().getBucket();
+            String img="";
+            if(thumbService.findThumbByNum((Integer) p[10]).isPresent()){
+                thumbService.findThumbByNum((Integer) p[10]).get().getBucket();
+            }
+
             BasicPlaceDTO basicPlaceDTO = BasicPlaceDTO.builder().placenum((Integer) p[0]).city((String)p[1]).name((String)p[6]).picture(img).build();
             basicPlaceDTOS.add(basicPlaceDTO);
         }
         return new ResponseEntity<>(basicPlaceDTOS,HttpStatus.OK);
+    }
+
+    @PostMapping("/Delete/{schedulenum}")
+    public ResponseEntity deleteSchedule(@PathVariable Integer schedulenum){
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     private List<Day> sendML(MLDTO mldto) throws Exception{
