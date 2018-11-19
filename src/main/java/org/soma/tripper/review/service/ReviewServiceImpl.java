@@ -50,6 +50,12 @@ public class ReviewServiceImpl implements ReviewService {
     public void delete(Review review) {
         reviewRepository.delete(review);
     }
+
+    @Override
+    public Optional<Review> loadReviewBySeqnum(int seqnum) {
+        return reviewRepository.findReviewByReviewnum(seqnum);
+    }
+
 }
 
 

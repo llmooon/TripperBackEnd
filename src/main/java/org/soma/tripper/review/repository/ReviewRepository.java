@@ -17,7 +17,7 @@
         Page<Review> findReviewsByIsvalid(Pageable pageRequest,int isvalid);
 
         Optional<Review> findReviewByReviewnum(int reviewnum);
-
+        Optional<Review> findReviewBySeqnum(int seqnum);
         Optional<List<Review>> findReviewByUsernum(int usernum);
         Optional<Review> findReviewByUsernumAndSeqnum(int usernum,int seqnum);
 

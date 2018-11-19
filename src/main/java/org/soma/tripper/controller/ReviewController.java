@@ -125,13 +125,16 @@ public class ReviewController {
 
     @ApiOperation(value="review - write/Modify_review (리뷰 사진 업로드/수정) ")
     @PostMapping(value = "/uploadPhoto")
-    public ResponseEntity<Photo> uploadPhoto(@RequestParam int detailsnum, @RequestParam MultipartFile file){
+    public ResponseEntity<Photo> uploadPhoto(@RequestParam int detailsnum, @RequestParam int seqnum,@RequestParam MultipartFile file){
         Details details = detailsService.loadDetailsByDetailsnum(detailsnum).orElseThrow(()->new NoSuchDataException("잘못된 detailsnum"));
         ImagePath imagePath = this.amazonClient.uploadFile(file);
         String imgUrl = s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName();
         Photo photo = Photo.builder().bucket(imgUrl).build();
         details.addPhoto(photo);
         detailsService.save(details);
+        Review review = reviewService.loadReviewBySeqnum(seqnum).orElseThrow(()->new NoSuchDataException());
+        review.setIsvalid(1);
+        ReviewDTO res = reviewService.uploadReview(review).toReviewDTO();
         return new ResponseEntity<>(photo,HttpStatus.OK);
     }
 
