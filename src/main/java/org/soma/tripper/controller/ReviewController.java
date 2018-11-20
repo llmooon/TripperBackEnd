@@ -140,7 +140,7 @@ public class ReviewController {
 
     @ApiOperation(value="review - Detail_review (리뷰 제목 뒤 배경 사진 업로드. 근데 어디서 업로드?)")
     @PostMapping(value = "/uploadMainPhoto")
-    public ResponseEntity<String> upload(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam MultipartFile file){
+    public ResponseEntity<Photo> upload(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam MultipartFile file){
         int usernum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
         Review review = reviewService.loadReviewBySeqnum(seqnum).orElseThrow(()->new NoSuchDataException("없는 seqnum"));
         if(review.getThumb()!=null){
@@ -149,9 +149,11 @@ public class ReviewController {
         }
         ImagePath imagePath = this.amazonClient.uploadFile(file);
         String imgUrl = s3Url+imagePath.getDateName()+"/thumb/"+imagePath.getFileName();
+
         review.setThumb(Thumb.builder().bucket(imgUrl).build());
-        reviewService.uploadReview(review);
-        return new ResponseEntity<>(imgUrl,HttpStatus.OK);
+        Review review1 = reviewService.uploadReview(review);
+        Photo photo = Photo.builder().bucket(review1.getThumb().getBucket()).build();
+        return new ResponseEntity<>(photo,HttpStatus.OK);
     }
 
     @ApiOperation(value="review - Detail_review (리뷰 로드)")
