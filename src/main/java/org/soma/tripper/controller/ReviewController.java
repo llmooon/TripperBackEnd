@@ -142,7 +142,7 @@ public class ReviewController {
     @PostMapping(value = "/uploadMainPhoto")
     public ResponseEntity<String> upload(@RequestParam String userEmail, @RequestParam int seqnum, @RequestParam MultipartFile file){
         int usernum=userService.findUserByEmail(userEmail).orElseThrow(()->new NoSuchDataException()).getUser_num();
-        Review review = reviewService.loadReviewByUserAndSeq(usernum,seqnum).orElseThrow(()->new NoSuchDataException("없는 seqnum"));
+        Review review = reviewService.loadReviewBySeqnum(seqnum).orElseThrow(()->new NoSuchDataException("없는 seqnum"));
         if(review.getThumb()!=null){
             String url=review.getThumb().getBucket();
             amazonClient.deleteFileFromS3Bucket(url);

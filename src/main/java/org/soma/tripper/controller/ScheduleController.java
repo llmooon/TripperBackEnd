@@ -226,7 +226,7 @@ public class ScheduleController {
         AverageLO = AverageLO/scheduleList.size();
 
         PageRequest request;
-        request= PageRequest.of(page,20);
+        request= PageRequest.of(page,40);
         List<Object[]> placeList = placeService.getPlaceByVersion(version,AverageLA,AverageLO,request);
         List<BasicPlaceDTO> basicPlaceDTOS = new ArrayList<>();
         for(Object[] p : placeList){

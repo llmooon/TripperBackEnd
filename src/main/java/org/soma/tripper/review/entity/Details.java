@@ -19,6 +19,8 @@ public class Details {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int detailsnum;
+    @Lob
+    @Column(columnDefinition = "text")
     private String content;
     private int reviewnum;
 
