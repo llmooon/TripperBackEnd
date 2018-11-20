@@ -116,7 +116,7 @@ public class ScheduleController {
     @GetMapping("isvalidmodify/{seqnum}")
     public ResponseEntity<Boolean> isvalidModify(@PathVariable Integer seqnum){
         Review review = reviewService.loadReviewBySeqnum(seqnum).orElseThrow(()-> new NoSuchDataException("error seqnum"));
-        if(review.getIsvalid()==1) return new ResponseEntity<>(true,HttpStatus.OK);
+        if(review.getIsvalid()==0) return new ResponseEntity<>(true,HttpStatus.OK);
         return new ResponseEntity<>(false,HttpStatus.OK);
     }
 
