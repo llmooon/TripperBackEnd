@@ -90,13 +90,19 @@ public class ScheduleController {
                 .build();
         try {
             List<Day> dayList = sendML(mldto);
+            String region = "한국, 부산";
+            logger.info("1");
         Seq seq = Seq.builder()
                 .dayList(dayList)
                 .user(user)
-                .region("한국,부산")
+                .region(region)
                 .totalday(purposeDTO.getDays())
                 .build();
-        Seq result = seqService.insertSeq(seq);
+            logger.info("2");
+
+            Seq result = seqService.insertSeq(seq);
+            logger.info("3");
+
 //        //didn't TestPlace!
         initReview(seq,user);
         return new ResponseEntity<>(result.toDTO(),HttpStatus.OK);
