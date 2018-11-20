@@ -29,7 +29,7 @@ public class User implements Serializable {
     private String name;
     private int sex;
     private String device_token;
-    private String url;
+    private String url="https://s3.ap-northeast-2.amazonaws.com/tripper-bucket/default.png";
 
 
     @Builder User( String name, String email, String password, int sex, String device_token){

@@ -73,6 +73,7 @@ public class PlaceController {
         Page<Details> details=detailsService.loadDetailsByPlace(request,place);
         List<PlaceReviewDTO> placeReviewDTOS = new ArrayList<>();
         for(Details d:details){
+            if(d.getContent()==null || d.getContent()=="") continue;
             Review review = reviewService.loadReviewById(d.getReviewnum()).orElseThrow(()-> new NoSuchDataException("error reviewnum"));
             User user = userService.findUserByUsernum(review.getUsernum()).orElseThrow(()-> new NoSuchDataException("error usernum"));
             placeReviewDTOS.add(PlaceReviewDTO.builder()
