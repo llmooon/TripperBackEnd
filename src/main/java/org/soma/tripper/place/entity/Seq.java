@@ -23,9 +23,9 @@ public class Seq {
     private int seqnum;
     private Date fromdate;
     private Date toDate;
-    private String title;
+    private String title="일정 제목을 설정해 주세요!";
     private int totalday;
-    private String region;
+    private String region="한국,부산";
 
     public void setTitle(String title) {
         this.title = title;
