@@ -36,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import sun.font.TrueTypeFont;
 
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -48,7 +49,6 @@ import java.util.List;
 @Api(value="Schedule Controller",description = "스케쥴 API")
 
 public class ScheduleController {
-
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String PYTHON_SERVER_URL="http://mlserver-env.pscqzdq4bm.ap-northeast-2.elasticbeanstalk.com/recommend/2/?";
     @Autowired
@@ -93,7 +93,7 @@ public class ScheduleController {
         Seq seq = Seq.builder()
                 .dayList(dayList)
                 .user(user)
-                .region(purposeDTO.getRegion())
+                .region("한국,부산")
                 .totalday(purposeDTO.getDays())
                 .build();
         Seq result = seqService.insertSeq(seq);
@@ -105,6 +105,13 @@ public class ScheduleController {
          logger.info("error");
          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("isvalidmodify/{seqnum}")
+    public ResponseEntity<Boolean> isvalidModify(@PathVariable Integer seqnum){
+        Review review = reviewService.loadReviewBySeqnum(seqnum).orElseThrow(()-> new NoSuchDataException("error seqnum"));
+        if(review.getIsvalid()==1) return new ResponseEntity<>(true,HttpStatus.OK);
+        return new ResponseEntity<>(false,HttpStatus.OK);
     }
 
     @ApiOperation(value = "menu - My Schedule (유저별 스케쥴 로드)")
