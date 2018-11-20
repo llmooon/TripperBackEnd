@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soma.tripper.common.exception.NoSuchDataException;
 import org.soma.tripper.place.Service.PlaceService;
+import org.soma.tripper.place.Service.PlaceThumbService;
 import org.soma.tripper.place.Service.SeqService;
 import org.soma.tripper.place.dto.MLDTO;
 import org.soma.tripper.place.dto.PurposeDTO;
@@ -74,6 +75,9 @@ public class ScheduleController {
 
     @Autowired
     PhotoService photoService;
+
+    @Autowired
+    PlaceThumbService placeThumbService;
 
     @Autowired
     DetailsService detailsService;
@@ -237,8 +241,8 @@ public class ScheduleController {
         List<BasicPlaceDTO> basicPlaceDTOS = new ArrayList<>();
         for(Object[] p : placeList){
             String img="";
-            if(thumbService.findThumbByNum((Integer) p[10]).isPresent()){
-                thumbService.findThumbByNum((Integer) p[10]).get().getBucket();
+            if(placeThumbService.findThumbByNum((Integer) p[10]).isPresent()){
+                img=placeThumbService.findThumbByNum((Integer) p[10]).get().getBucket();
             }
 
             BasicPlaceDTO basicPlaceDTO = BasicPlaceDTO.builder().placenum((Integer) p[0]).city((String)p[1]).name((String)p[6]).picture(img).build();
